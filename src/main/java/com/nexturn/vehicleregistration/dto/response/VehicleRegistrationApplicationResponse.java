@@ -6,27 +6,64 @@ import java.time.LocalDate;
 
 import com.nexturn.vehicleregistration.enums.ApplicationStatus;
 import com.nexturn.vehicleregistration.enums.ApplicationType;
+import com.nexturn.vehicleregistration.enums.FinalResult;
 import com.nexturn.vehicleregistration.enums.InspectionStatus;
 
 public record VehicleRegistrationApplicationResponse(
-        String reference,
-        ApplicationType type,
-        ApplicationStatus status,
-        BigDecimal amount,
-        Instant submittedAt,
-        Instant updatedAt,
+
+        String applicationRefNo,
+
         Long vehicleId,
-        String vehicle,
-        String owner,
-        VehicleResponse vehicleDetails,
-        OwnerResponse applicant,
+
+        Long applicantId,
+
+        ApplicationType applicationType,
+
+        ApplicationStatus applicationStatus,
+
+        Long feeRuleId,
+
+        BigDecimal payableAmount,
+
+        LocalDate previousValidUntil,
+
+        Instant submittedDate,
+
+        Instant updatedDate,
+
         String verificationRemark,
-        LocalDate inspectionDate,
-        InspectionStatus inspectionStatus,
+
+        Long verifiedByEmployeeId,
+
+        Instant verifiedAt,
+
+        LocalDate inspectionScheduleDate,
+
         String inspectionRemark,
+
+        Long inspectedByEmployeeId,
+
+        Instant inspectedAt,
+
+        Long decidedByEmployeeId,
+
+        Instant decidedAt,
+
         String decisionRemarks,
-        boolean paid,
-        PaymentResponse payment
+
+        InspectionStatus inspectionStatus,
+
+        FinalResult finalResult,
+
+        long version,
+
+        VehicleResponse vehicle,
+
+        OwnerResponse applicant,
+
+        OwnerPaymentDetailResponse payment,
+
+        RegistrationCertificateResponse certificate
 
 ) {
 }

@@ -1,5 +1,7 @@
 package com.nexturn.vehicleregistration.dto.response;
 
+import java.time.Instant;
+
 import com.nexturn.vehicleregistration.enums.AccountStatus;
 import com.nexturn.vehicleregistration.enums.RTOEmployeeDesignation;
 import com.nexturn.vehicleregistration.enums.RTOEmployeeRole;
@@ -12,7 +14,7 @@ public record RTOEmployeeResponse(
         String phoneNumber,
         RTOEmployeeDesignation designation,
         RTOEmployeeRole role,
-        AccountStatus status
-
+        AccountStatus status,
+        Instant dateOfJoining
 ) {
 }

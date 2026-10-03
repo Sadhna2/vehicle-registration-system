@@ -6,7 +6,7 @@ import com.nexturn.vehicleregistration.enums.FuelType;
 import com.nexturn.vehicleregistration.enums.VehicleCategory;
 
 public record VehicleResponse(
-        Long temporaryRegisterNo,
+        Long temporaryregisterNo,
         OwnerResponse currentOwner,
         VehicleCategory vehicleCategory,
         String manufacturerName,
@@ -15,10 +15,9 @@ public record VehicleResponse(
         String engineNumber,
         FuelType fuelType,
         int manufactureYear,
-        String registrationCertificateNumber,
+        String registrationcertificateNumber,
         LocalDate firstRegistrationDate,
         LocalDate registrationValidTill,
         String colorVariant
-
 ) {
 }
