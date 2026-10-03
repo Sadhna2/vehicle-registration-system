@@ -1,0 +1,54 @@
+package com.nexturn.vehicleregistration.repository;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+
+import jakarta.persistence.LockModeType;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import com.nexturn.vehicleregistration.entity.VehicleRegistrationApplication;
+import com.nexturn.vehicleregistration.enums.ApplicationStatus;
+
+public interface VehicleRegistrationApplicationRepository
+		extends JpaRepository<VehicleRegistrationApplication, String> {
+
+	Page<VehicleRegistrationApplication> findByApplicantOwnerId(Long id, Pageable pageable);
+
+	@Query("""
+			select a from Application a
+			where a.applicant.ownerId = :id
+			or a.applicationRefNo in (
+			    select t.application.applicationRefNo
+			    from Transfer t
+			    where t.newOwner.ownerId = :id
+			)
+			""")
+	Page<VehicleRegistrationApplication> visibleTo(@Param("id") Long id, Pageable pageable);
+
+	boolean existsByVehicleTemporaryregisterNoAndApplicationStatusNotIn(Long id,
+			Collection<ApplicationStatus> statuses);
+
+	@Lock(LockModeType.PESSIMISTIC_WRITE)
+	@Query("select a from Application a where a.applicationRefNo = :ref")
+	Optional<VehicleRegistrationApplication> locked(@Param("ref") String ref);
+
+	interface StatusCount {
+		ApplicationStatus getStatus();
+
+		long getTotal();
+	}
+
+	@Query("""
+			select a.applicationStatus as status, count(a) as total
+			from Application a
+			group by a.applicationStatus
+			""")
+	List<StatusCount> countStatuses();
+}
