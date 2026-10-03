@@ -11,11 +11,25 @@ import jakarta.validation.constraints.Size;
 
 public record RTOEmployeeRequest(
 
-		@NotBlank @Size(max = 30) String firstName,
-		@NotBlank @Size(max = 30) String lastName,
-		@NotBlank @Email String emailAddress,
-		@NotBlank @Size(min = 10, max = 128) String password,
-		@NotNull @Pattern(regexp = "[0-9+]{10,15}") String phoneNumber,
-		@NotNull RTOEmployeeDesignation designation,
-		@NotNull RTOEmployeeRole role) {
+        @NotBlank
+        @Size(max = 30)
+        String firstName,
+        @NotBlank
+        @Size(max = 30)
+        String lastName,
+        @NotBlank
+        @Email
+        @Size(max = 100)
+        String emailAddress,
+        @NotBlank
+        @Pattern(regexp = "[0-9+]{10,15}")
+        String phoneNumber,
+        @NotBlank
+        @Size(min = 10, max = 128)
+        String password,
+        @NotNull
+        RTOEmployeeDesignation designation,
+        @NotNull
+        RTOEmployeeRole role
+) {
 }
