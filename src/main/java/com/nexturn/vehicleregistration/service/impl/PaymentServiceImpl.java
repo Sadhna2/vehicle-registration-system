@@ -1,0 +1,100 @@
+package com.nexturn.vehicleregistration.service.impl;
+
+import static com.nexturn.vehicleregistration.service.WorkflowSupport.ensure;
+
+import com.nexturn.vehicleregistration.auth.Actor;
+import com.nexturn.vehicleregistration.dto.request.PaymentRequest;
+import com.nexturn.vehicleregistration.dto.response.ApplicationDetailsResponse;
+import com.nexturn.vehicleregistration.entity.OwnerPaymentDetail;
+import com.nexturn.vehicleregistration.entity.VehicleRegistrationApplication;
+import com.nexturn.vehicleregistration.enums.ApplicationStatus;
+import com.nexturn.vehicleregistration.enums.PaymentStatus;
+import com.nexturn.vehicleregistration.exception.ApplicationIdNotFoundException;
+import com.nexturn.vehicleregistration.exception.PaymentAmountMismatchException;
+import com.nexturn.vehicleregistration.repository.ApplicationWorkflowRepository;
+import com.nexturn.vehicleregistration.repository.OwnerPaymentRepository;
+import com.nexturn.vehicleregistration.service.ApplicationAccessService;
+import com.nexturn.vehicleregistration.service.ApplicationQueryService;
+import com.nexturn.vehicleregistration.service.AuditService;
+import com.nexturn.vehicleregistration.service.PaymentService;
+
+import java.time.Instant;
+import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional
+public class PaymentServiceImpl implements PaymentService {
+
+    private final ApplicationWorkflowRepository applicationRepository;
+    private final OwnerPaymentRepository paymentRepository;
+    private final ApplicationQueryService applicationQueryService;
+    private final ApplicationAccessService applicationAccessService;
+    private final AuditService auditService;
+
+    public PaymentServiceImpl(
+            ApplicationWorkflowRepository applicationRepository,
+            OwnerPaymentRepository paymentRepository,
+            ApplicationQueryService applicationQueryService,
+            ApplicationAccessService applicationAccessService,
+            AuditService auditService) {
+
+        this.applicationRepository = applicationRepository;
+        this.paymentRepository = paymentRepository;
+        this.applicationQueryService = applicationQueryService;
+        this.applicationAccessService = applicationAccessService;
+        this.auditService = auditService;
+    }
+
+    @Override
+    public ApplicationDetailsResponse pay(
+            String referenceNumber,
+            PaymentRequest request,
+            Actor actor) {
+
+        VehicleRegistrationApplication application = applicationRepository
+                .locked(referenceNumber)
+                .orElseThrow(
+                        () -> new ApplicationIdNotFoundException(referenceNumber));
+
+        applicationAccessService.ownerApplication(application, actor);
+
+        ensure(
+                application.getApplicationStatus() != ApplicationStatus.REJECTED
+                        && application.getApplicationStatus()
+                                != ApplicationStatus.APPROVED,
+                "Application is closed");
+
+        if (application.getPayableAmount().compareTo(request.amount()) != 0) {
+            throw new PaymentAmountMismatchException();
+        }
+
+        if (paymentRepository
+                .findByApplicationApplicationRefNo(referenceNumber)
+                .isPresent()) {
+
+            return applicationQueryService.detail(application);
+        }
+
+        OwnerPaymentDetail payment = new OwnerPaymentDetail();
+
+        payment.setApplication(application);
+        payment.setAmountPaid(application.getPayableAmount());
+        payment.setCardLastFourDigit(request.cardLastFourDigit());
+        payment.setTransactionReferenceId("SIM-" + UUID.randomUUID());
+        payment.setPaymentStatus(PaymentStatus.SUCCESS);
+        payment.setPaidAt(Instant.now());
+
+        paymentRepository.save(payment);
+
+        auditService.record(
+                actor,
+                application,
+                "PAYMENT_RECORDED",
+                "Simulated payment");
+
+        return applicationQueryService.detail(application);
+    }
+}
