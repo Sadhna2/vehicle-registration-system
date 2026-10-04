@@ -22,21 +22,26 @@ public interface VehicleRegistrationApplicationRepository
 	Page<VehicleRegistrationApplication> findByApplicantOwnerId(Long id, Pageable pageable);
 
 	@Query("""
-			select a from Application a
-			where a.applicant.ownerId = :id
-			or a.applicationRefNo in (
-			    select t.application.applicationRefNo
-			    from Transfer t
-			    where t.newOwner.ownerId = :id
-			)
-			""")
-	Page<VehicleRegistrationApplication> visibleTo(@Param("id") Long id, Pageable pageable);
-
+	        select a from VehicleRegistrationApplication a
+	        where a.applicant.ownerId = :id
+	        or a.applicationRefNo in (
+	            select t.application.applicationRefNo
+	            from OwnershipTransferRequest t
+	            where t.newOwner.ownerId = :id
+	        )
+	        """)
+	Page<VehicleRegistrationApplication> visibleTo(
+	        @Param("id") Long id,
+	        Pageable pageable);
 	boolean existsByVehicleTemporaryregisterNoAndApplicationStatusNotIn(Long id,
 			Collection<ApplicationStatus> statuses);
 
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
-	@Query("select a from Application a where a.applicationRefNo = :ref")
+	@Query("""
+		    select a
+		    from VehicleRegistrationApplication a
+		    where a.applicationRefNo = :ref
+		""")
 	Optional<VehicleRegistrationApplication> locked(@Param("ref") String ref);
 
 	interface StatusCount {
@@ -46,9 +51,10 @@ public interface VehicleRegistrationApplicationRepository
 	}
 
 	@Query("""
-			select a.applicationStatus as status, count(a) as total
-			from Application a
-			group by a.applicationStatus
-			""")
+		    select a.applicationStatus as status,
+		           count(a) as total
+		    from VehicleRegistrationApplication a
+		    group by a.applicationStatus
+		""")
 	List<StatusCount> countStatuses();
 }
