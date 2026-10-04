@@ -1,5 +1,4 @@
 package com.nexturn.vehicleregistration.dto.request;
-
 import java.time.LocalDate;
 
 import com.nexturn.vehicleregistration.enums.IdentityProofType;
