@@ -109,7 +109,7 @@ public class Owner {
   }
 
   public java.time.LocalDate getDateOfBirth() {
-    return dateOfBirth;
+    return dateOfBirth; 
   }
 
   public void setDateOfBirth(java.time.LocalDate value) {

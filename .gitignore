@@ -10,4 +10,4 @@ target/
 .env
 .env.*
 application-local.yml
-application-local.properties
+config/application-local.properties
