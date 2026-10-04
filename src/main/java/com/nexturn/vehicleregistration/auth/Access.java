@@ -1,4 +1,4 @@
-package com.nexturn.vehicleregistration.auth;
+ package com.nexturn.vehicleregistration.auth;
 
 import com.nexturn.vehicleregistration.dto.request.RequestInfo;
 import com.nexturn.vehicleregistration.enums.*;
