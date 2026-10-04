@@ -2,8 +2,6 @@ import { useState } from "react";
 import Form from "./Form";
 import { api, today } from "../api";
 
-
-
 export default function Auth({ onLogin, run, busy }) {
   const [signup, setSignup] = useState(false);
   const [staff, setStaff] = useState(false);
@@ -110,36 +108,6 @@ export default function Auth({ onLogin, run, busy }) {
       ];
   return (
     <main className={`auth-wrap ${signup ? "signup-layout" : ""}`}>
-      <div className="auth-intro">
-        <div className="eyebrow intro-eyebrow">
-          <span className="live-dot" /> NEW VEHICLE REGISTRATION
-        </div>
-        <h1>
-          A new vehicle.
-          <br />A clear road ahead.
-        </h1>
-        <p className="intro-description">
-          From your first application to your registration certificate. Follow
-          every step in one place.
-        </p>
-        <VehicleIllustration />
-        <div className="intro-steps">
-          {[
-            ["01", "Apply", "Add your vehicle details"],
-            ["02", "Track", "Follow verification & inspection"],
-            ["03", "Get your RC", "View your issued certificate"],
-          ].map(([number, title, description]) => (
-            <div key={number}>
-              <span>{number}</span>
-              <strong>{title}</strong>
-              <small>{description}</small>
-            </div>
-          ))}
-        </div>
-        <p className="intro-footnote">
-          Vehicle owner services · RTO review · Registration certificates
-        </p>
-      </div>
       <section className="card auth-card">
         <div className="eyebrow mb-3">
           {signup ? "OWNER REGISTRATION" : "YOUR REGISTRATION WORKSPACE"}

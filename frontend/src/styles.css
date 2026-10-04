@@ -157,85 +157,12 @@ body {
 }
 .auth-wrap {
   display: grid;
-  grid-template-columns: 1.12fr 1fr;
-  gap: 72px;
-  max-width: 1260px;
+  grid-template-columns: 1fr;
+  gap: 0;
+  max-width: 540px;
   margin: 52px auto 38px;
   padding: 0 32px;
   align-items: center;
-}
-.auth-intro {
-  background: #173f3b;
-  color: #fdf5e3;
-  border-radius: 22px;
-  padding: 45px 42px 27px;
-  min-width: 0;
-  position: relative;
-  overflow: hidden;
-}
-.auth-intro h1 {
-  font-size: clamp(35px, 3.5vw, 49px);
-  line-height: 1.12;
-  letter-spacing: -1.8px;
-  font-weight: 600;
-  margin: 26px 0 19px;
-}
-.intro-eyebrow {
-  color: #b4d1b8;
-  display: flex;
-  gap: 9px;
-  align-items: center;
-  font-size: 9px;
-}
-.live-dot {
-  width: 6px;
-  height: 6px;
-  background: #7fd2b1;
-  border-radius: 50%;
-  display: inline-block;
-}
-.auth-intro .intro-description {
-  color: #c0d5ca;
-  line-height: 1.8;
-  font-size: 14px;
-  max-width: 360px;
-  margin-bottom: 0;
-}
-.vehicle-illustration {
-  width: 100%;
-  margin: 19px 0 18px;
-  color: #d6ead0;
-}
-.intro-steps {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-  border-top: 1px solid #446057;
-  padding-top: 22px;
-}
-.intro-steps span {
-  color: #8ebca6;
-  display: block;
-  font-size: 10px;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
-}
-.intro-steps strong {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-}
-.intro-steps small {
-  display: block;
-  color: #b3c8ba;
-  font-size: 10px;
-  line-height: 1.6;
-  margin-top: 6px;
-}
-.auth-intro .intro-footnote {
-  font-size: 9px;
-  color: #8ea99b;
-  margin: 26px 0 0;
 }
 .auth-card {
   background: transparent;
@@ -310,10 +237,7 @@ body {
 }
 .signup-layout {
   align-items: start;
-}
-.signup-layout .auth-intro {
-  position: sticky;
-  top: 24px;
+  max-width: 800px;
 }
 .form-label {
   font-size: 12px;
@@ -544,9 +468,6 @@ a:focus-visible {
   .auth-wrap {
     gap: 38px;
   }
-  .auth-intro {
-    padding: 35px 27px 25px;
-  }
   .registration-progress {
     grid-template-columns: repeat(3, 1fr);
     gap: 17px;
@@ -559,20 +480,6 @@ a:focus-visible {
     gap: 34px;
     margin-top: 28px;
   }
-  .auth-intro {
-    padding: 30px;
-  }
-  .auth-intro h1 {
-    font-size: 38px;
-  }
-  .vehicle-illustration {
-    max-width: 380px;
-    display: block;
-    margin: 3px auto 9px;
-  }
-  .signup-layout .auth-intro {
-    position: static;
-  }
   .main-content {
     padding: 25px;
   }
@@ -584,21 +491,6 @@ a:focus-visible {
   .auth-wrap {
     padding: 0 18px;
     margin: 22px auto;
-  }
-  .auth-intro {
-    padding: 28px 24px 20px;
-    border-radius: 14px;
-  }
-  .auth-intro h1 {
-    font-size: 32px;
-    letter-spacing: -1px;
-    margin-top: 22px;
-  }
-  .intro-steps {
-    gap: 10px;
-  }
-  .intro-steps small {
-    font-size: 9px;
   }
   .auth-card h2 {
     font-size: 27px;
