@@ -1,7 +1,9 @@
 package com.nexturn.vehicleregistration.mapper;
 
 import com.nexturn.vehicleregistration.dto.response.ApplicationDetailsResponse;
-import com.nexturn.vehicleregistration.entity.*;
+import com.nexturn.vehicleregistration.entity.OwnerPaymentDetail;
+import com.nexturn.vehicleregistration.entity.RegistrationCertificate;
+import com.nexturn.vehicleregistration.entity.VehicleRegistrationApplication;
 
 public final class ApplicationDetailsMapper {
 

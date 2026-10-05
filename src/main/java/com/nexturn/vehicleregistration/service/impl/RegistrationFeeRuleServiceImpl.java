@@ -2,13 +2,10 @@ package com.nexturn.vehicleregistration.service.impl;
 
 import static com.nexturn.vehicleregistration.service.WorkflowSupport.ensure;
 
-import com.nexturn.vehicleregistration.auth.Access;
-import com.nexturn.vehicleregistration.auth.Actor;
 import com.nexturn.vehicleregistration.dto.request.RegistrationFeeRuleRequest;
 import com.nexturn.vehicleregistration.dto.response.RegistrationFeeRuleResponse;
 import com.nexturn.vehicleregistration.entity.RegistrationFeeRule;
 import com.nexturn.vehicleregistration.enums.ApplicationType;
-import com.nexturn.vehicleregistration.enums.SessionRole;
 import com.nexturn.vehicleregistration.mapper.RegistrationFeeRuleMapper;
 import com.nexturn.vehicleregistration.repository.RegistrationFeeRuleRepository;
 import com.nexturn.vehicleregistration.service.AuditService;
@@ -26,16 +23,13 @@ public class RegistrationFeeRuleServiceImpl
         implements RegistrationFeeRuleService {
 
     private final RegistrationFeeRuleRepository feeRuleRepository;
-    private final Access access;
     private final AuditService auditService;
 
     public RegistrationFeeRuleServiceImpl(
             RegistrationFeeRuleRepository feeRuleRepository,
-            Access access,
             AuditService auditService) {
 
         this.feeRuleRepository = feeRuleRepository;
-        this.access = access;
         this.auditService = auditService;
     }
 
@@ -53,10 +47,7 @@ public class RegistrationFeeRuleServiceImpl
 
     @Override
     public RegistrationFeeRuleResponse fee(
-            RegistrationFeeRuleRequest request,
-            Actor actor) {
-
-        access.require(actor, SessionRole.RTO_ADMIN);
+            RegistrationFeeRuleRequest request) {
 
         ensure(
                 request.applicationType() == ApplicationType.NEW,
@@ -72,7 +63,6 @@ public class RegistrationFeeRuleServiceImpl
         RegistrationFeeRule savedFeeRule = feeRuleRepository.save(feeRule);
 
         auditService.record(
-                actor,
                 null,
                 "FEE_CREATED",
                 ApplicationType.NEW.name());

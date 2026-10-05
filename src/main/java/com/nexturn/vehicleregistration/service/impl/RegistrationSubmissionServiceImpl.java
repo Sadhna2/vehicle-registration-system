@@ -2,8 +2,6 @@ package com.nexturn.vehicleregistration.service.impl;
 
 import static com.nexturn.vehicleregistration.service.WorkflowSupport.ensure;
 
-import com.nexturn.vehicleregistration.auth.Access;
-import com.nexturn.vehicleregistration.auth.Actor;
 import com.nexturn.vehicleregistration.dto.request.NewVehicleRegistrationRequest;
 import com.nexturn.vehicleregistration.dto.response.ApplicationDetailsResponse;
 import com.nexturn.vehicleregistration.entity.Owner;
@@ -12,7 +10,6 @@ import com.nexturn.vehicleregistration.entity.Vehicle;
 import com.nexturn.vehicleregistration.entity.VehicleRegistrationApplication;
 import com.nexturn.vehicleregistration.enums.ApplicationStatus;
 import com.nexturn.vehicleregistration.enums.ApplicationType;
-import com.nexturn.vehicleregistration.enums.SessionRole;
 import com.nexturn.vehicleregistration.exception.ApplicationIdNotFoundException;
 import com.nexturn.vehicleregistration.exception.FeeRuleNotFoundException;
 import com.nexturn.vehicleregistration.exception.OwnerNotFoundException;
@@ -20,7 +17,6 @@ import com.nexturn.vehicleregistration.repository.ApplicationWorkflowRepository;
 import com.nexturn.vehicleregistration.repository.OwnerRepository;
 import com.nexturn.vehicleregistration.repository.RegistrationFeeRuleRepository;
 import com.nexturn.vehicleregistration.repository.VechileRepository;
-import com.nexturn.vehicleregistration.service.ApplicationAccessService;
 import com.nexturn.vehicleregistration.service.ApplicationQueryService;
 import com.nexturn.vehicleregistration.service.AuditService;
 import com.nexturn.vehicleregistration.service.RegistrationSubmissionService;
@@ -44,9 +40,7 @@ public class RegistrationSubmissionServiceImpl
     private final VechileRepository vehicleRepository;
     private final ApplicationWorkflowRepository applicationRepository;
     private final RegistrationFeeRuleRepository feeRuleRepository;
-    private final Access access;
     private final ApplicationQueryService applicationQueryService;
-    private final ApplicationAccessService applicationAccessService;
     private final AuditService auditService;
 
     public RegistrationSubmissionServiceImpl(
@@ -54,31 +48,24 @@ public class RegistrationSubmissionServiceImpl
             VechileRepository vehicleRepository,
             ApplicationWorkflowRepository applicationRepository,
             RegistrationFeeRuleRepository feeRuleRepository,
-            Access access,
             ApplicationQueryService applicationQueryService,
-            ApplicationAccessService applicationAccessService,
             AuditService auditService) {
 
         this.ownerRepository = ownerRepository;
         this.vehicleRepository = vehicleRepository;
         this.applicationRepository = applicationRepository;
         this.feeRuleRepository = feeRuleRepository;
-        this.access = access;
         this.applicationQueryService = applicationQueryService;
-        this.applicationAccessService = applicationAccessService;
         this.auditService = auditService;
     }
 
     @Override
     public ApplicationDetailsResponse submit(
-            NewVehicleRegistrationRequest request,
-            Actor actor) {
-
-        access.require(actor, SessionRole.OWNER);
+            NewVehicleRegistrationRequest request, Long ownerId) {
 
         Owner owner = ownerRepository
-                .findById(actor.id())
-                .orElseThrow(() -> new OwnerNotFoundException(actor.id()));
+                .findById(ownerId)
+                .orElseThrow(() -> new OwnerNotFoundException(ownerId));
 
         Vehicle vehicle = new Vehicle();
         vehicle.setCurrentOwner(owner);
@@ -88,7 +75,7 @@ public class RegistrationSubmissionServiceImpl
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
 
         VehicleRegistrationApplication application =
-                createApplication(savedVehicle, owner, actor);
+                createApplication(savedVehicle, owner);
 
         return applicationQueryService.detail(application);
     }
@@ -96,15 +83,12 @@ public class RegistrationSubmissionServiceImpl
     @Override
     public ApplicationDetailsResponse correct(
             String referenceNumber,
-            NewVehicleRegistrationRequest request,
-            Actor actor) {
+            NewVehicleRegistrationRequest request) {
 
         VehicleRegistrationApplication application = applicationRepository
                 .locked(referenceNumber)
                 .orElseThrow(
                         () -> new ApplicationIdNotFoundException(referenceNumber));
-
-        applicationAccessService.ownerApplication(application, actor);
 
         ensure(
                 application.getApplicationStatus()
@@ -122,15 +106,14 @@ public class RegistrationSubmissionServiceImpl
         application.setUpdatedDate(Instant.now());
 
         auditService.record(
-                actor, application, "RESUBMITTED", null);
+                application, "RESUBMITTED", null);
 
         return applicationQueryService.detail(application);
     }
 
     private VehicleRegistrationApplication createApplication(
             Vehicle vehicle,
-            Owner owner,
-            Actor actor) {
+            Owner owner) {
 
         boolean openApplicationExists = applicationRepository
                 .existsByVehicleTemporaryregisterNoAndApplicationStatusNotIn(
@@ -171,7 +154,6 @@ public class RegistrationSubmissionServiceImpl
                 applicationRepository.save(application);
 
         auditService.record(
-                actor,
                 savedApplication,
                 "SUBMITTED",
                 ApplicationType.NEW.name());

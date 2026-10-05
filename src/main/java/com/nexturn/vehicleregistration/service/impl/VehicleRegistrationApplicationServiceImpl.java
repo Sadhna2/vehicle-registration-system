@@ -1,6 +1,5 @@
 package com.nexturn.vehicleregistration.service.impl;
 
-import com.nexturn.vehicleregistration.auth.Actor;
 import com.nexturn.vehicleregistration.dto.request.ApplicationReviewRequest;
 import com.nexturn.vehicleregistration.dto.request.NewVehicleRegistrationRequest;
 import com.nexturn.vehicleregistration.dto.request.PaymentRequest;
@@ -41,64 +40,59 @@ public class VehicleRegistrationApplicationServiceImpl
 
     @Override
     public ApplicationDetailsResponse submit(
-            NewVehicleRegistrationRequest request,
-            Actor actor) {
+            NewVehicleRegistrationRequest request, Long ownerId) {
 
-        return registrationSubmissionService.submit(request, actor);
+        return registrationSubmissionService.submit(request, ownerId);
     }
 
     @Override
     public ApplicationDetailsResponse correct(
             String referenceNumber,
-            NewVehicleRegistrationRequest request,
-            Actor actor) {
+            NewVehicleRegistrationRequest request) {
 
         return registrationSubmissionService.correct(
-                referenceNumber, request, actor);
+                referenceNumber, request);
     }
 
     @Override
     public ApplicationDetailsResponse pay(
             String referenceNumber,
-            PaymentRequest request,
-            Actor actor) {
+            PaymentRequest request) {
 
-        return paymentService.pay(referenceNumber, request, actor);
+        return paymentService.pay(referenceNumber, request);
     }
 
     @Override
     public ApplicationDetailsResponse review(
             String referenceNumber,
-            ApplicationReviewRequest request,
-            Actor actor) {
+            ApplicationReviewRequest request, Long employeeId) {
 
         return applicationReviewService.review(
-                referenceNumber, request, actor);
+                referenceNumber, request, employeeId);
     }
 
     @Override
-    public ApplicationPageResponse list(
-            Actor actor, int page, int size) {
+    public ApplicationPageResponse list(Long ownerId, int page, int size) {
 
-        return applicationQueryService.list(actor, page, size);
+        return applicationQueryService.list(ownerId, page, size);
     }
 
     @Override
     public ApplicationDetailsResponse get(
-            String referenceNumber, Actor actor) {
+            String referenceNumber) {
 
-        return applicationQueryService.get(referenceNumber, actor);
+        return applicationQueryService.get(referenceNumber);
     }
 
     @Override
-    public List<VehicleResponse> vehicles(Actor actor) {
-        return applicationQueryService.vehicles(actor);
+    public List<VehicleResponse> vehicles(Long ownerId) {
+        return applicationQueryService.vehicles(ownerId);
     }
 
     @Override
     public RegistrationCertificateResponse certificate(
-            String referenceNumber, Actor actor) {
+            String referenceNumber) {
 
-        return applicationQueryService.certificate(referenceNumber, actor);
+        return applicationQueryService.certificate(referenceNumber);
     }
 }

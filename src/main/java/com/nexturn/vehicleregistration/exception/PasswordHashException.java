@@ -3,6 +3,7 @@ package com.nexturn.vehicleregistration.exception;
 import org.springframework.http.HttpStatus;
 
 public class PasswordHashException extends RuntimeException implements ApiError {
+  private static final long serialVersionUID = 1L;
   public PasswordHashException(Throwable cause) {
     super("Password hashing is unavailable.", cause);
   }

@@ -1,6 +1,15 @@
 package com.nexturn.vehicleregistration.entity;
 
-import jakarta.persistence.*;
+import java.time.LocalDate;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "registration_certificate")
@@ -18,10 +27,10 @@ public class RegistrationCertificate {
   private RTOEmployee issuedBy;
 
   @Column(nullable = false)
-  private java.time.LocalDate issuedDate;
+  private LocalDate issuedDate;
 
   @Column(nullable = false)
-  private java.time.LocalDate validTill;
+  private LocalDate validTill;
 
   @ManyToOne(optional = false, fetch = FetchType.LAZY)
   @JoinColumn(name = "register_owner_id")
@@ -51,19 +60,19 @@ public class RegistrationCertificate {
     this.issuedBy = value;
   }
 
-  public java.time.LocalDate getIssuedDate() {
+  public LocalDate getIssuedDate() {
     return issuedDate;
   }
 
-  public void setIssuedDate(java.time.LocalDate value) {
+  public void setIssuedDate(LocalDate value) {
     this.issuedDate = value;
   }
 
-  public java.time.LocalDate getValidTill() {
+  public LocalDate getValidTill() {
     return validTill;
   }
 
-  public void setValidTill(java.time.LocalDate value) {
+  public void setValidTill(LocalDate value) {
     this.validTill = value;
   }
 

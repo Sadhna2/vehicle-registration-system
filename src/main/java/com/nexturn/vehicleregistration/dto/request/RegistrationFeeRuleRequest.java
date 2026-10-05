@@ -13,14 +13,11 @@ public record RegistrationFeeRuleRequest(
 
         @NotNull
         VehicleCategory vehicleCategory,
-
         @NotNull
         ApplicationType applicationType,
-
         @NotNull
         @DecimalMin("0.01")
         BigDecimal feeAmount,
-
         @NotNull
         LocalDate effectiveFrom
 

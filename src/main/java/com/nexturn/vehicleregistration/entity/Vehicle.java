@@ -1,10 +1,22 @@
 package com.nexturn.vehicleregistration.entity;
 
 
+import java.time.LocalDate;
+
 import com.nexturn.vehicleregistration.enums.FuelType;
 import com.nexturn.vehicleregistration.enums.VehicleCategory;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "vehicle_details")
@@ -44,8 +56,8 @@ public class Vehicle {
   @Column(unique = true, length = 20)
   private String registrationcertificateNumber;
 
-  private java.time.LocalDate firstRegistrationDate;
-  private java.time.LocalDate registrationValidTill;
+  private LocalDate firstRegistrationDate;
+  private LocalDate registrationValidTill;
 
   @Column(length = 30)
   private String colorVariant;
@@ -130,19 +142,19 @@ public class Vehicle {
     this.registrationcertificateNumber = value;
   }
 
-  public java.time.LocalDate getFirstRegistrationDate() {
+  public LocalDate getFirstRegistrationDate() {
     return firstRegistrationDate;
   }
 
-  public void setFirstRegistrationDate(java.time.LocalDate value) {
+  public void setFirstRegistrationDate(LocalDate value) {
     this.firstRegistrationDate = value;
   }
 
-  public java.time.LocalDate getRegistrationValidTill() {
+  public LocalDate getRegistrationValidTill() {
     return registrationValidTill;
   }
 
-  public void setRegistrationValidTill(java.time.LocalDate value) {
+  public void setRegistrationValidTill(LocalDate value) {
     this.registrationValidTill = value;
   }
 

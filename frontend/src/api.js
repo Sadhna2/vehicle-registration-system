@@ -1,5 +1,3 @@
-let accessToken = null;
-
 export async function api(path, method = "GET", data) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 20000);
@@ -7,13 +5,11 @@ export async function api(path, method = "GET", data) {
   try {
     response = await fetch(`/api${path}`, {
       method,
-      credentials: "same-origin",
+      credentials: "omit",
       signal: controller.signal,
       headers: {
         Accept: "application/json",
         ...(data === undefined ? {} : { "Content-Type": "application/json" }),
-        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-        "X-Requested-With": "XMLHttpRequest",
       },
       ...(data === undefined ? {} : { body: JSON.stringify(data) }),
     });
@@ -49,17 +45,15 @@ export async function api(path, method = "GET", data) {
         (response.status >= 500
           ? "The service could not complete this request. Please try again shortly."
           : response.status === 401
-            ? "Please sign in to continue."
+            ? "Invalid email or password."
             : response.status === 403
               ? "Your account does not have access to this action."
               : `This request could not be completed (${response.status}).`),
     );
     error.status = response.status;
     error.code = body?.code;
-    if (response.status === 401) accessToken = null;
     throw error;
   }
-  if (path === "/auth/logout") accessToken = null;
   return normalize(body);
 }
 
@@ -83,10 +77,6 @@ export const today = () => {
 function normalize(value) {
   if (Array.isArray(value)) return value.map(normalize);
   if (!value || typeof value !== "object") return value;
-  if (value.accessToken && value.user) {
-    accessToken = value.accessToken;
-    return value.user;
-  }
   const row = Object.fromEntries(
     Object.entries(value).map(([key, item]) => [key, normalize(item)]),
   );

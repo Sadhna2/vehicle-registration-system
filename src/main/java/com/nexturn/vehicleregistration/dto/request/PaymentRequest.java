@@ -11,7 +11,6 @@ public record PaymentRequest(
         @NotNull
         @DecimalMin("0.01")
         BigDecimal amount,
-
         @NotNull
         @Pattern(regexp = "[0-9]{4}")
         String cardLastFourDigit

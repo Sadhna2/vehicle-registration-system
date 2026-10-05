@@ -1,6 +1,5 @@
 package com.nexturn.vehicleregistration.service;
 
-import com.nexturn.vehicleregistration.auth.Actor;
 import com.nexturn.vehicleregistration.dto.request.ApplicationReviewRequest;
 import com.nexturn.vehicleregistration.dto.request.NewVehicleRegistrationRequest;
 import com.nexturn.vehicleregistration.dto.request.PaymentRequest;
@@ -14,32 +13,27 @@ import java.util.List;
 public interface VehicleRegistrationApplicationService {
 
     ApplicationDetailsResponse submit(
-            NewVehicleRegistrationRequest request,
-            Actor actor);
+            NewVehicleRegistrationRequest request, Long ownerId);
 
     ApplicationDetailsResponse correct(
             String referenceNumber,
-            NewVehicleRegistrationRequest request,
-            Actor actor);
+            NewVehicleRegistrationRequest request);
 
     ApplicationDetailsResponse pay(
             String referenceNumber,
-            PaymentRequest request,
-            Actor actor);
+            PaymentRequest request);
 
     ApplicationDetailsResponse review(
             String referenceNumber,
-            ApplicationReviewRequest request,
-            Actor actor);
+            ApplicationReviewRequest request, Long employeeId);
 
-    ApplicationPageResponse list(
-            Actor actor, int page, int size);
+    ApplicationPageResponse list(Long ownerId, int page, int size);
 
     ApplicationDetailsResponse get(
-            String referenceNumber, Actor actor);
+            String referenceNumber);
 
-    List<VehicleResponse> vehicles(Actor actor);
+    List<VehicleResponse> vehicles(Long ownerId);
 
     RegistrationCertificateResponse certificate(
-            String referenceNumber, Actor actor);
+            String referenceNumber);
 }

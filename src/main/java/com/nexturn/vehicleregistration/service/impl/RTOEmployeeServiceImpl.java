@@ -2,17 +2,13 @@ package com.nexturn.vehicleregistration.service.impl;
 
 import static com.nexturn.vehicleregistration.service.WorkflowSupport.ensure;
 
-import com.nexturn.vehicleregistration.auth.Access;
-import com.nexturn.vehicleregistration.auth.Actor;
-import com.nexturn.vehicleregistration.auth.Passwords;
 import com.nexturn.vehicleregistration.dto.request.AccountRequest;
 import com.nexturn.vehicleregistration.dto.request.RTOEmployeeRequest;
 import com.nexturn.vehicleregistration.dto.response.OwnerResponse;
 import com.nexturn.vehicleregistration.dto.response.RTOEmployeeResponse;
 import com.nexturn.vehicleregistration.entity.Owner;
 import com.nexturn.vehicleregistration.entity.RTOEmployee;
-import com.nexturn.vehicleregistration.enums.RTOEmployeeRole;
-import com.nexturn.vehicleregistration.enums.SessionRole;
+import com.nexturn.vehicleregistration.util.PasswordUtil;
 import com.nexturn.vehicleregistration.exception.DuplicateRecordException;
 import com.nexturn.vehicleregistration.exception.EmployeeNotFoundException;
 import com.nexturn.vehicleregistration.exception.InvalidRequestException;
@@ -37,26 +33,21 @@ public class RTOEmployeeServiceImpl implements RTOEmployeeService {
 
     private final OwnerRepository ownerRepository;
     private final RTOEmployeeRepository employeeRepository;
-    private final Access access;
     private final AuditService auditService;
 
     public RTOEmployeeServiceImpl(
             OwnerRepository ownerRepository,
             RTOEmployeeRepository employeeRepository,
-            Access access,
             AuditService auditService) {
 
         this.ownerRepository = ownerRepository;
         this.employeeRepository = employeeRepository;
-        this.access = access;
         this.auditService = auditService;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<RTOEmployeeResponse> employees(Actor actor) {
-
-        access.require(actor, SessionRole.RTO_ADMIN, SessionRole.SYSTEM_ADMIN);
+    public List<RTOEmployeeResponse> employees() {
 
         return employeeRepository.findAll()
                 .stream()
@@ -66,15 +57,9 @@ public class RTOEmployeeServiceImpl implements RTOEmployeeService {
 
     @Override
     public RTOEmployeeResponse employee(
-            RTOEmployeeRequest request, Actor actor) {
+            RTOEmployeeRequest request) {
 
-        access.require(actor, SessionRole.RTO_ADMIN, SessionRole.SYSTEM_ADMIN);
 
-        if (actor.role() == SessionRole.RTO_ADMIN) {
-            ensure(
-                    request.role() == RTOEmployeeRole.RTO_OFFICER,
-                    "Only system admin can create administrators");
-        }
 
         String email = request.emailAddress()
                 .trim()
@@ -90,7 +75,7 @@ public class RTOEmployeeServiceImpl implements RTOEmployeeService {
         employee.setFirstName(request.firstName());
         employee.setLastName(request.lastName());
         employee.setEmailAddress(email);
-        employee.setPassword(Passwords.hash(request.password()));
+        employee.setPassword(PasswordUtil.hash(request.password()));
         employee.setPhoneNumber(request.phoneNumber());
         employee.setDesignation(request.designation());
         employee.setRole(request.role());
@@ -98,7 +83,6 @@ public class RTOEmployeeServiceImpl implements RTOEmployeeService {
         RTOEmployee savedEmployee = employeeRepository.save(employee);
 
         auditService.record(
-                actor,
                 null,
                 "EMPLOYEE_CREATED",
                 savedEmployee.getEmailAddress());
@@ -108,9 +92,7 @@ public class RTOEmployeeServiceImpl implements RTOEmployeeService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<OwnerResponse> owners(Actor actor) {
-
-        access.require(actor, SessionRole.SYSTEM_ADMIN);
+    public List<OwnerResponse> owners() {
 
         return ownerRepository.findAll()
                 .stream()
@@ -122,23 +104,19 @@ public class RTOEmployeeServiceImpl implements RTOEmployeeService {
     public void account(
             String accountType,
             Long accountId,
-            AccountRequest request,
-            Actor actor) {
-
-        access.require(actor, SessionRole.SYSTEM_ADMIN);
+            AccountRequest request) {
 
         if ("owners".equals(accountType)) {
             updateOwner(accountId, request);
 
         } else if ("employees".equals(accountType)) {
-            updateEmployee(accountId, request, actor);
+            updateEmployee(accountId, request);
 
         } else {
             throw new InvalidRequestException("Unknown account type");
         }
 
         auditService.record(
-                actor,
                 null,
                 "ACCOUNT_UPDATED",
                 accountType + ":" + accountId);
@@ -159,12 +137,7 @@ public class RTOEmployeeServiceImpl implements RTOEmployeeService {
 
     private void updateEmployee(
             Long employeeId,
-            AccountRequest request,
-            Actor actor) {
-
-        ensure(
-                !employeeId.equals(actor.id()),
-                "Cannot modify your own administrator account");
+            AccountRequest request) {
 
         RTOEmployee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new EmployeeNotFoundException(employeeId));

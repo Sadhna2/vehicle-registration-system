@@ -1,6 +1,7 @@
 package com.nexturn.vehicleregistration.dto.response;
 
-import com.nexturn.vehicleregistration.enums.*;
+import com.nexturn.vehicleregistration.enums.ApplicationType;
+import com.nexturn.vehicleregistration.enums.VehicleCategory;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 

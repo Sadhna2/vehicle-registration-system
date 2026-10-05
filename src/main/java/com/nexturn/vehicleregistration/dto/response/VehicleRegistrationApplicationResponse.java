@@ -12,58 +12,31 @@ import com.nexturn.vehicleregistration.enums.InspectionStatus;
 public record VehicleRegistrationApplicationResponse(
 
         String applicationRefNo,
-
         Long vehicleId,
-
         Long applicantId,
-
         ApplicationType applicationType,
-
         ApplicationStatus applicationStatus,
-
         Long feeRuleId,
-
         BigDecimal payableAmount,
-
         LocalDate previousValidUntil,
-
         Instant submittedDate,
-
         Instant updatedDate,
-
         String verificationRemark,
-
         Long verifiedByEmployeeId,
-
         Instant verifiedAt,
-
         LocalDate inspectionScheduleDate,
-
         String inspectionRemark,
-
         Long inspectedByEmployeeId,
-
         Instant inspectedAt,
-
         Long decidedByEmployeeId,
-
         Instant decidedAt,
-
         String decisionRemarks,
-
         InspectionStatus inspectionStatus,
-
         FinalResult finalResult,
-
         long version,
-
         VehicleResponse vehicle,
-
         OwnerResponse applicant,
-
         OwnerPaymentDetailResponse payment,
-
         RegistrationCertificateResponse certificate
-
 ) {
 }

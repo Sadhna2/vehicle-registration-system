@@ -1,6 +1,5 @@
 package com.nexturn.vehicleregistration.dto.request;
 
-import com.nexturn.vehicleregistration.enums.FuelType;
 import com.nexturn.vehicleregistration.enums.VehicleCategory;
 
 import jakarta.validation.constraints.NotBlank;

@@ -442,17 +442,7 @@ a:focus-visible {
   border-radius: 11px;
   padding: 24px;
 }
-.number-plate {
-  display: inline-block;
-  background: #fffefa;
-  border: 2px solid #8c9985;
-  border-radius: 5px;
-  padding: 16px 26px;
-  font-size: 28px;
-  letter-spacing: 4px;
-  font-weight: 700;
-  color: #263b30;
-}
+
 .fee-schedule {
   background: #f2f5ec;
   border: 1px solid #e3eadb;

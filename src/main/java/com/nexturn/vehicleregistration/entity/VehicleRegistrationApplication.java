@@ -1,11 +1,24 @@
 package com.nexturn.vehicleregistration.entity;
 
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+
 import com.nexturn.vehicleregistration.enums.ApplicationStatus;
 import com.nexturn.vehicleregistration.enums.ApplicationType;
 import com.nexturn.vehicleregistration.enums.FinalResult;
 import com.nexturn.vehicleregistration.enums.InspectionStatus;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 @Entity
 @Table(name = "vehicle_registration_applications")
@@ -35,15 +48,15 @@ public class VehicleRegistrationApplication {
   private RegistrationFeeRule feeRule;
 
   @Column(precision = 10, scale = 2, nullable = false)
-  private java.math.BigDecimal payableAmount;
+  private BigDecimal payableAmount;
 
-  private java.time.LocalDate previousValidUntil;
-
-  @Column(nullable = false)
-  private java.time.Instant submittedDate = java.time.Instant.now();
+  private LocalDate previousValidUntil;
 
   @Column(nullable = false)
-  private java.time.Instant updatedDate = java.time.Instant.now();
+  private Instant submittedDate = Instant.now();
+
+  @Column(nullable = false)
+  private Instant updatedDate = Instant.now();
 
   @Column(length = 500)
   private String verificationRemark;
@@ -52,8 +65,8 @@ public class VehicleRegistrationApplication {
   @JoinColumn(name = "verified_by")
   private RTOEmployee verifiedBy;
 
-  private java.time.Instant verifiedAt;
-  private java.time.LocalDate inspectionScheduleDate;
+  private Instant verifiedAt;
+  private LocalDate inspectionScheduleDate;
 
   @Column(length = 500)
   private String inspectionRemark;
@@ -62,13 +75,13 @@ public class VehicleRegistrationApplication {
   @JoinColumn(name = "inspected_by")
   private RTOEmployee inspectedBy;
 
-  private java.time.Instant inspectedAt;
+  private Instant inspectedAt;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "decided_by")
   private RTOEmployee decidedBy;
 
-  private java.time.Instant decidedAt;
+  private Instant decidedAt;
 
   @Column(length = 500)
   private String decisionRemarks;
@@ -138,35 +151,35 @@ public class VehicleRegistrationApplication {
     this.feeRule = value;
   }
 
-  public java.math.BigDecimal getPayableAmount() {
+  public BigDecimal getPayableAmount() {
     return payableAmount;
   }
 
-  public void setPayableAmount(java.math.BigDecimal value) {
+  public void setPayableAmount(BigDecimal value) {
     this.payableAmount = value;
   }
 
-  public java.time.LocalDate getPreviousValidUntil() {
+  public LocalDate getPreviousValidUntil() {
     return previousValidUntil;
   }
 
-  public void setPreviousValidUntil(java.time.LocalDate value) {
+  public void setPreviousValidUntil(LocalDate value) {
     this.previousValidUntil = value;
   }
 
-  public java.time.Instant getSubmittedDate() {
+  public Instant getSubmittedDate() {
     return submittedDate;
   }
 
-  public void setSubmittedDate(java.time.Instant value) {
+  public void setSubmittedDate(Instant value) {
     this.submittedDate = value;
   }
 
-  public java.time.Instant getUpdatedDate() {
+  public Instant getUpdatedDate() {
     return updatedDate;
   }
 
-  public void setUpdatedDate(java.time.Instant value) {
+  public void setUpdatedDate(Instant value) {
     this.updatedDate = value;
   }
 
@@ -186,19 +199,19 @@ public class VehicleRegistrationApplication {
     this.verifiedBy = value;
   }
 
-  public java.time.Instant getVerifiedAt() {
+  public Instant getVerifiedAt() {
     return verifiedAt;
   }
 
-  public void setVerifiedAt(java.time.Instant value) {
+  public void setVerifiedAt(Instant value) {
     this.verifiedAt = value;
   }
 
-  public java.time.LocalDate getInspectionScheduleDate() {
+  public LocalDate getInspectionScheduleDate() {
     return inspectionScheduleDate;
   }
 
-  public void setInspectionScheduleDate(java.time.LocalDate value) {
+  public void setInspectionScheduleDate(LocalDate value) {
     this.inspectionScheduleDate = value;
   }
 
@@ -218,11 +231,11 @@ public class VehicleRegistrationApplication {
     this.inspectedBy = value;
   }
 
-  public java.time.Instant getInspectedAt() {
+  public Instant getInspectedAt() {
     return inspectedAt;
   }
 
-  public void setInspectedAt(java.time.Instant value) {
+  public void setInspectedAt(Instant value) {
     this.inspectedAt = value;
   }
 
@@ -234,11 +247,11 @@ public class VehicleRegistrationApplication {
     this.decidedBy = value;
   }
 
-  public java.time.Instant getDecidedAt() {
+  public Instant getDecidedAt() {
     return decidedAt;
   }
 
-  public void setDecidedAt(java.time.Instant value) {
+  public void setDecidedAt(Instant value) {
     this.decidedAt = value;
   }
 

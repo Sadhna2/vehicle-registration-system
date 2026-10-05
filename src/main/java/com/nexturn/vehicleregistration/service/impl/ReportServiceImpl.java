@@ -1,11 +1,8 @@
 package com.nexturn.vehicleregistration.service.impl;
 
-import com.nexturn.vehicleregistration.auth.Access;
-import com.nexturn.vehicleregistration.auth.Actor;
 import com.nexturn.vehicleregistration.dto.response.AuditLogResponse;
 import com.nexturn.vehicleregistration.enums.ApplicationStatus;
 import com.nexturn.vehicleregistration.enums.PaymentStatus;
-import com.nexturn.vehicleregistration.enums.SessionRole;
 import com.nexturn.vehicleregistration.mapper.AuditLogMapper;
 import com.nexturn.vehicleregistration.repository.ApplicationWorkflowRepository;
 import com.nexturn.vehicleregistration.repository.AuditLogRepository;
@@ -34,28 +31,23 @@ public class ReportServiceImpl implements ReportService {
     private final ApplicationWorkflowRepository applicationRepository;
     private final OwnerPaymentRepository paymentRepository;
     private final AuditLogRepository auditLogRepository;
-    private final Access access;
 
     public ReportServiceImpl(
             OwnerRepository ownerRepository,
             VechileRepository vehicleRepository,
             ApplicationWorkflowRepository applicationRepository,
             OwnerPaymentRepository paymentRepository,
-            AuditLogRepository auditLogRepository,
-            Access access) {
+            AuditLogRepository auditLogRepository) {
 
         this.ownerRepository = ownerRepository;
         this.vehicleRepository = vehicleRepository;
         this.applicationRepository = applicationRepository;
         this.paymentRepository = paymentRepository;
         this.auditLogRepository = auditLogRepository;
-        this.access = access;
     }
 
     @Override
-    public Map<String, Object> report(Actor actor) {
-
-        access.require(actor, SessionRole.RTO_ADMIN, SessionRole.SYSTEM_ADMIN);
+    public Map<String, Object> report() {
 
         Map<String, Long> statusCounts = new LinkedHashMap<>();
 
@@ -85,9 +77,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<AuditLogResponse> audits(Actor actor) {
-
-        access.require(actor, SessionRole.RTO_ADMIN, SessionRole.SYSTEM_ADMIN);
+    public List<AuditLogResponse> audits() {
 
         return auditLogRepository
                 .findAll(

@@ -2,7 +2,6 @@ package com.nexturn.vehicleregistration.service.impl;
 
 import static com.nexturn.vehicleregistration.service.WorkflowSupport.ensure;
 
-import com.nexturn.vehicleregistration.auth.Actor;
 import com.nexturn.vehicleregistration.dto.request.PaymentRequest;
 import com.nexturn.vehicleregistration.dto.response.ApplicationDetailsResponse;
 import com.nexturn.vehicleregistration.entity.OwnerPaymentDetail;
@@ -13,7 +12,6 @@ import com.nexturn.vehicleregistration.exception.ApplicationIdNotFoundException;
 import com.nexturn.vehicleregistration.exception.PaymentAmountMismatchException;
 import com.nexturn.vehicleregistration.repository.ApplicationWorkflowRepository;
 import com.nexturn.vehicleregistration.repository.OwnerPaymentRepository;
-import com.nexturn.vehicleregistration.service.ApplicationAccessService;
 import com.nexturn.vehicleregistration.service.ApplicationQueryService;
 import com.nexturn.vehicleregistration.service.AuditService;
 import com.nexturn.vehicleregistration.service.PaymentService;
@@ -31,35 +29,29 @@ public class PaymentServiceImpl implements PaymentService {
     private final ApplicationWorkflowRepository applicationRepository;
     private final OwnerPaymentRepository paymentRepository;
     private final ApplicationQueryService applicationQueryService;
-    private final ApplicationAccessService applicationAccessService;
     private final AuditService auditService;
 
     public PaymentServiceImpl(
             ApplicationWorkflowRepository applicationRepository,
             OwnerPaymentRepository paymentRepository,
             ApplicationQueryService applicationQueryService,
-            ApplicationAccessService applicationAccessService,
             AuditService auditService) {
 
         this.applicationRepository = applicationRepository;
         this.paymentRepository = paymentRepository;
         this.applicationQueryService = applicationQueryService;
-        this.applicationAccessService = applicationAccessService;
         this.auditService = auditService;
     }
 
     @Override
     public ApplicationDetailsResponse pay(
             String referenceNumber,
-            PaymentRequest request,
-            Actor actor) {
+            PaymentRequest request) {
 
         VehicleRegistrationApplication application = applicationRepository
                 .locked(referenceNumber)
                 .orElseThrow(
                         () -> new ApplicationIdNotFoundException(referenceNumber));
-
-        applicationAccessService.ownerApplication(application, actor);
 
         ensure(
                 application.getApplicationStatus() != ApplicationStatus.REJECTED
@@ -90,7 +82,6 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.save(payment);
 
         auditService.record(
-                actor,
                 application,
                 "PAYMENT_RECORDED",
                 "Simulated payment");

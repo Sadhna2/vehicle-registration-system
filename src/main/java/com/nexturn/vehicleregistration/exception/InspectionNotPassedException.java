@@ -2,8 +2,8 @@ package com.nexturn.vehicleregistration.exception;
 
 import org.springframework.http.HttpStatus;
 
-@SuppressWarnings("serial")
 public class InspectionNotPassedException extends RuntimeException implements ApiError {
+  private static final long serialVersionUID = 1L;
   public InspectionNotPassedException() {
     super("A passed inspection is required before approval.");
   }

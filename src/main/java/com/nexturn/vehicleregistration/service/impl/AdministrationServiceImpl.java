@@ -1,6 +1,5 @@
 package com.nexturn.vehicleregistration.service.impl;
 
-import com.nexturn.vehicleregistration.auth.Actor;
 import com.nexturn.vehicleregistration.dto.request.AccountRequest;
 import com.nexturn.vehicleregistration.dto.request.RTOEmployeeRequest;
 import com.nexturn.vehicleregistration.dto.request.RegistrationFeeRuleRequest;
@@ -42,45 +41,44 @@ public class AdministrationServiceImpl implements AdministrationService {
 
     @Override
     public RegistrationFeeRuleResponse fee(
-            RegistrationFeeRuleRequest request, Actor actor) {
+            RegistrationFeeRuleRequest request) {
 
-        return registrationFeeRuleService.fee(request, actor);
+        return registrationFeeRuleService.fee(request);
     }
 
     @Override
-    public List<RTOEmployeeResponse> employees(Actor actor) {
-        return employeeService.employees(actor);
+    public List<RTOEmployeeResponse> employees() {
+        return employeeService.employees();
     }
 
     @Override
     public RTOEmployeeResponse employee(
-            RTOEmployeeRequest request, Actor actor) {
+            RTOEmployeeRequest request) {
 
-        return employeeService.employee(request, actor);
+        return employeeService.employee(request);
     }
 
     @Override
-    public List<OwnerResponse> owners(Actor actor) {
-        return employeeService.owners(actor);
+    public List<OwnerResponse> owners() {
+        return employeeService.owners();
     }
 
     @Override
     public void account(
             String accountType,
             Long accountId,
-            AccountRequest request,
-            Actor actor) {
+            AccountRequest request) {
 
-        employeeService.account(accountType, accountId, request, actor);
+        employeeService.account(accountType, accountId, request);
     }
 
     @Override
-    public Map<String, Object> report(Actor actor) {
-        return reportService.report(actor);
+    public Map<String, Object> report() {
+        return reportService.report();
     }
 
     @Override
-    public List<AuditLogResponse> audits(Actor actor) {
-        return reportService.audits(actor);
+    public List<AuditLogResponse> audits() {
+        return reportService.audits();
     }
 }

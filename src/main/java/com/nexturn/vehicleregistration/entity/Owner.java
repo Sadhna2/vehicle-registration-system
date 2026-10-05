@@ -1,9 +1,20 @@
 package com.nexturn.vehicleregistration.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.time.Instant;
+import java.time.LocalDate;
+
 import com.nexturn.vehicleregistration.enums.AccountStatus;
 import com.nexturn.vehicleregistration.enums.IdentityProofType;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "owner_details")
@@ -24,12 +35,12 @@ public class Owner {
   @Column(nullable = false, length = 15)
   private String phoneNumber;
 
-  @com.fasterxml.jackson.annotation.JsonIgnore
+  @JsonIgnore
   @Column(nullable = false, length = 255)
   private String password;
 
   @Column(nullable = false)
-  private java.time.LocalDate dateOfBirth;
+  private LocalDate dateOfBirth;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
@@ -55,10 +66,10 @@ public class Owner {
   private AccountStatus status = AccountStatus.ACTIVE;
 
   @Column(nullable = false)
-  private java.time.Instant dateOfCreation = java.time.Instant.now();
+  private Instant dateOfCreation = Instant.now();
 
   @Column(nullable = false)
-  private java.time.Instant dateOfUpdate = java.time.Instant.now();
+  private Instant dateOfUpdate = Instant.now();
 
   public Long getOwnerId() {
     return ownerId;
@@ -108,11 +119,11 @@ public class Owner {
     this.password = value;
   }
 
-  public java.time.LocalDate getDateOfBirth() {
+  public LocalDate getDateOfBirth() {
     return dateOfBirth; 
   }
 
-  public void setDateOfBirth(java.time.LocalDate value) {
+  public void setDateOfBirth(LocalDate value) {
     this.dateOfBirth = value;
   }
 
@@ -172,19 +183,19 @@ public class Owner {
     this.status = value;
   }
 
-  public java.time.Instant getDateOfCreation() {
+  public Instant getDateOfCreation() {
     return dateOfCreation;
   }
 
-  public void setDateOfCreation(java.time.Instant value) {
+  public void setDateOfCreation(Instant value) {
     this.dateOfCreation = value;
   }
 
-  public java.time.Instant getDateOfUpdate() {
+  public Instant getDateOfUpdate() {
     return dateOfUpdate;
   }
 
-  public void setDateOfUpdate(java.time.Instant value) {
+  public void setDateOfUpdate(Instant value) {
     this.dateOfUpdate = value;
   }
 }

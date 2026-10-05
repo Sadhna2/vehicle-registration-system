@@ -4,19 +4,20 @@ import Status from "./Status";
 import Form from "./Form";
 import VehicleForm from "./VehicleForm";
 import Progress from "./Progress";
-export default function Detail({ data, actor, run, busy, onChange, onClose }) {
+import RegistrationCertificate from "./RegistrationCertificate";
+export default function Detail({ data, user, run, busy, onChange, onClose }) {
   const [remarks, setRemarks] = useState("");
   const [appointment, setAppointment] = useState(today());
   const [certificate, setCertificate] = useState(data.certificate);
-  const owner = actor.role === "OWNER";
-  const applicant = owner && actor.id === data.applicant.ownerId;
-  const reviewer = ["RTO_OFFICER", "RTO_ADMIN"].includes(actor.role);
+  const owner = user.role === "OWNER";
+  const applicant = owner && user.id === data.applicant.ownerId;
+  const reviewer = ["RTO_OFFICER", "RTO_ADMIN"].includes(user.role);
   const closed = ["APPROVED", "REJECTED"].includes(data.status);
   const act = (path, method, body) =>
     run(async () =>
       onChange(
         await api(
-          `/applications/${encodeURIComponent(data.reference)}/${path}`,
+          `/applications/${encodeURIComponent(data.reference)}/${path}${path === "review" ? `?employeeId=${user.id}` : ""}`,
           method,
           body,
         ),
@@ -224,25 +225,10 @@ export default function Detail({ data, actor, run, busy, onChange, onClose }) {
             </button>
           </div>
           {(certificate || data.certificate) && (
-            <div className="row g-3 mt-2">
-              <div className="col-md-6">
-                <div className="number-plate">
-                  {(certificate || data.certificate).registrationNumber}
-                </div>
-              </div>
-              <div className="col-md-6">
-                <dl className="mb-0">
-                  <dt>Registered owner</dt>
-                  <dd>
-                    {(certificate || data.certificate).registeredOwnerName}
-                  </dd>
-                  <dt>Issued on</dt>
-                  <dd>{(certificate || data.certificate).issuedDate}</dd>
-                  <dt>Valid until</dt>
-                  <dd>{(certificate || data.certificate).validTill}</dd>
-                </dl>
-              </div>
-            </div>
+            <RegistrationCertificate
+              certificate={certificate || data.certificate}
+              application={data}
+            />
           )}
         </div>
       )}

@@ -2,8 +2,6 @@ package com.nexturn.vehicleregistration.service.impl;
 
 import static com.nexturn.vehicleregistration.service.WorkflowSupport.ensure;
 
-import com.nexturn.vehicleregistration.auth.Access;
-import com.nexturn.vehicleregistration.auth.Actor;
 import com.nexturn.vehicleregistration.dto.request.ApplicationReviewRequest;
 import com.nexturn.vehicleregistration.dto.response.ApplicationDetailsResponse;
 import com.nexturn.vehicleregistration.entity.RTOEmployee;
@@ -15,7 +13,6 @@ import com.nexturn.vehicleregistration.enums.ApplicationType;
 import com.nexturn.vehicleregistration.enums.FinalResult;
 import com.nexturn.vehicleregistration.enums.InspectionStatus;
 import com.nexturn.vehicleregistration.enums.PaymentStatus;
-import com.nexturn.vehicleregistration.enums.SessionRole;
 import com.nexturn.vehicleregistration.exception.ApplicationIdNotFoundException;
 import com.nexturn.vehicleregistration.exception.EmployeeNotFoundException;
 import com.nexturn.vehicleregistration.exception.InspectionNotPassedException;
@@ -44,7 +41,6 @@ public class ApplicationReviewServiceImpl implements ApplicationReviewService {
     private final ApplicationWorkflowRepository applicationRepository;
     private final OwnerPaymentRepository paymentRepository;
     private final RegistrationCertificateRepository certificateRepository;
-    private final Access access;
     private final ApplicationQueryService applicationQueryService;
     private final AuditService auditService;
 
@@ -56,7 +52,6 @@ public class ApplicationReviewServiceImpl implements ApplicationReviewService {
             ApplicationWorkflowRepository applicationRepository,
             OwnerPaymentRepository paymentRepository,
             RegistrationCertificateRepository certificateRepository,
-            Access access,
             ApplicationQueryService applicationQueryService,
             AuditService auditService) {
 
@@ -64,7 +59,6 @@ public class ApplicationReviewServiceImpl implements ApplicationReviewService {
         this.applicationRepository = applicationRepository;
         this.paymentRepository = paymentRepository;
         this.certificateRepository = certificateRepository;
-        this.access = access;
         this.applicationQueryService = applicationQueryService;
         this.auditService = auditService;
     }
@@ -72,10 +66,7 @@ public class ApplicationReviewServiceImpl implements ApplicationReviewService {
     @Override
     public ApplicationDetailsResponse review(
             String referenceNumber,
-            ApplicationReviewRequest request,
-            Actor actor) {
-
-        access.require(actor, SessionRole.RTO_OFFICER, SessionRole.RTO_ADMIN);
+            ApplicationReviewRequest request, Long employeeId) {
 
         VehicleRegistrationApplication application = applicationRepository
                 .locked(referenceNumber)
@@ -83,8 +74,8 @@ public class ApplicationReviewServiceImpl implements ApplicationReviewService {
                         () -> new ApplicationIdNotFoundException(referenceNumber));
 
         RTOEmployee employee = employeeRepository
-                .findById(actor.id())
-                .orElseThrow(() -> new EmployeeNotFoundException(actor.id()));
+                .findById(employeeId)
+                .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
 
         ensure(
                 application.getApplicationType() == ApplicationType.NEW,
@@ -131,7 +122,7 @@ public class ApplicationReviewServiceImpl implements ApplicationReviewService {
         application.setUpdatedDate(Instant.now());
 
         auditService.record(
-                actor, application, request.action(), remarks);
+                application, request.action(), remarks);
 
         return applicationQueryService.detail(application);
     }

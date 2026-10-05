@@ -3,6 +3,7 @@ package com.nexturn.vehicleregistration.exception;
 import org.springframework.http.HttpStatus;
 
 public class PaymentRequiredException extends RuntimeException implements ApiError {
+  private static final long serialVersionUID = 1L;
   public PaymentRequiredException() {
     super("A successful payment is required before approval.");
   }

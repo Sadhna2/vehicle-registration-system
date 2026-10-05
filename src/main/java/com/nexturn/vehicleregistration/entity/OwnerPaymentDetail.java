@@ -1,9 +1,22 @@
 package com.nexturn.vehicleregistration.entity;
 
+import java.math.BigDecimal;
+import java.time.Instant;
+
 import com.nexturn.vehicleregistration.enums.PaymentMethod;
 import com.nexturn.vehicleregistration.enums.PaymentStatus;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "owner_payment_detail")
@@ -17,7 +30,7 @@ public class OwnerPaymentDetail {
   private VehicleRegistrationApplication application;
 
   @Column(precision = 10, scale = 2, nullable = false)
-  private java.math.BigDecimal amountPaid;
+  private BigDecimal amountPaid;
 
   @Column(length = 4, nullable = false)
   private String cardLastFourDigit;
@@ -29,7 +42,7 @@ public class OwnerPaymentDetail {
   @Column(length = 20, nullable = false)
   private PaymentStatus paymentStatus = PaymentStatus.SUCCESS;
 
-  private java.time.Instant paidAt = java.time.Instant.now();
+  private Instant paidAt = Instant.now();
 
   @Enumerated(EnumType.STRING)
   @Column(length = 20, nullable = false)
@@ -51,11 +64,11 @@ public class OwnerPaymentDetail {
     this.application = value;
   }
 
-  public java.math.BigDecimal getAmountPaid() {
+  public BigDecimal getAmountPaid() {
     return amountPaid;
   }
 
-  public void setAmountPaid(java.math.BigDecimal value) {
+  public void setAmountPaid(BigDecimal value) {
     this.amountPaid = value;
   }
 
@@ -83,11 +96,11 @@ public class OwnerPaymentDetail {
     this.paymentStatus = value;
   }
 
-  public java.time.Instant getPaidAt() {
+  public Instant getPaidAt() {
     return paidAt;
   }
 
-  public void setPaidAt(java.time.Instant value) {
+  public void setPaidAt(Instant value) {
     this.paidAt = value;
   }
 

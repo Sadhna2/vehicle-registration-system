@@ -9,10 +9,8 @@ public record ApplicationReviewRequest(
 
         @NotBlank
         String action,
-
         @Size(max = 500)
         String remarks,
-
         LocalDate appointment
 
 ) {

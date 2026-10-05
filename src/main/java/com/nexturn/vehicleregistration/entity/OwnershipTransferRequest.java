@@ -1,8 +1,21 @@
 package com.nexturn.vehicleregistration.entity;
 
+import java.time.Instant;
+
 import com.nexturn.vehicleregistration.enums.TransferStatus;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "ownership_transfer_request")
@@ -38,7 +51,7 @@ public class OwnershipTransferRequest {
   private TransferStatus status = TransferStatus.PENDING;
 
   @Column(nullable = false)
-  private java.time.Instant requestedAt = java.time.Instant.now();
+  private Instant requestedAt = Instant.now();
 
   @Column(length = 500)
   private String remark;
@@ -107,11 +120,11 @@ public class OwnershipTransferRequest {
     this.status = value;
   }
 
-  public java.time.Instant getRequestedAt() {
+  public Instant getRequestedAt() {
     return requestedAt;
   }
 
-  public void setRequestedAt(java.time.Instant value) {
+  public void setRequestedAt(Instant value) {
     this.requestedAt = value;
   }
 

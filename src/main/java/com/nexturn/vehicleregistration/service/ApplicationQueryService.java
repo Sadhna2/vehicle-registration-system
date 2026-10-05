@@ -1,6 +1,5 @@
 package com.nexturn.vehicleregistration.service;
 
-import com.nexturn.vehicleregistration.auth.Actor;
 import com.nexturn.vehicleregistration.dto.response.ApplicationDetailsResponse;
 import com.nexturn.vehicleregistration.dto.response.ApplicationPageResponse;
 import com.nexturn.vehicleregistration.dto.response.RegistrationCertificateResponse;
@@ -14,13 +13,13 @@ public interface ApplicationQueryService {
     ApplicationDetailsResponse detail(
             VehicleRegistrationApplication application);
 
-    ApplicationPageResponse list(Actor actor, int page, int size);
+    ApplicationPageResponse list(Long ownerId, int page, int size);
 
     ApplicationDetailsResponse get(
-            String referenceNumber, Actor actor);
+            String referenceNumber);
 
-    List<VehicleResponse> vehicles(Actor actor);
+    List<VehicleResponse> vehicles(Long ownerId);
 
     RegistrationCertificateResponse certificate(
-            String referenceNumber, Actor actor);
+            String referenceNumber);
 }

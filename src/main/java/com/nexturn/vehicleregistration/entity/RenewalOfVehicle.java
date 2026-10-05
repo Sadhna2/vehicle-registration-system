@@ -1,6 +1,17 @@
 package com.nexturn.vehicleregistration.entity;
 
-import jakarta.persistence.*;
+import java.time.LocalDate;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "renewal_of_vehicle")
@@ -18,10 +29,10 @@ public class RenewalOfVehicle {
   private VehicleRegistrationApplication application;
 
   @Column(nullable = false)
-  private java.time.LocalDate oldValidTill;
+  private LocalDate oldValidTill;
 
   @Column(nullable = false)
-  private java.time.LocalDate newValidTill;
+  private LocalDate newValidTill;
 
   public Long getRenewalId() {
     return renewalId;
@@ -47,19 +58,19 @@ public class RenewalOfVehicle {
     this.application = value;
   }
 
-  public java.time.LocalDate getOldValidTill() {
+  public LocalDate getOldValidTill() {
     return oldValidTill;
   }
 
-  public void setOldValidTill(java.time.LocalDate value) {
+  public void setOldValidTill(LocalDate value) {
     this.oldValidTill = value;
   }
 
-  public java.time.LocalDate getNewValidTill() {
+  public LocalDate getNewValidTill() {
     return newValidTill;
   }
 
-  public void setNewValidTill(java.time.LocalDate value) {
+  public void setNewValidTill(LocalDate value) {
     this.newValidTill = value;
   }
 }

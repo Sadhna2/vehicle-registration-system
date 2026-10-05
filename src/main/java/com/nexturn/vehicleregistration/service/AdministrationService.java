@@ -1,6 +1,5 @@
 package com.nexturn.vehicleregistration.service;
 
-import com.nexturn.vehicleregistration.auth.Actor;
 import com.nexturn.vehicleregistration.dto.request.AccountRequest;
 import com.nexturn.vehicleregistration.dto.request.RTOEmployeeRequest;
 import com.nexturn.vehicleregistration.dto.request.RegistrationFeeRuleRequest;
@@ -17,22 +16,21 @@ public interface AdministrationService {
     List<RegistrationFeeRuleResponse> fees();
 
     RegistrationFeeRuleResponse fee(
-            RegistrationFeeRuleRequest request, Actor actor);
+            RegistrationFeeRuleRequest request);
 
-    List<RTOEmployeeResponse> employees(Actor actor);
+    List<RTOEmployeeResponse> employees();
 
     RTOEmployeeResponse employee(
-            RTOEmployeeRequest request, Actor actor);
+            RTOEmployeeRequest request);
 
-    List<OwnerResponse> owners(Actor actor);
+    List<OwnerResponse> owners();
 
     void account(
             String accountType,
             Long accountId,
-            AccountRequest request,
-            Actor actor);
+            AccountRequest request);
 
-    Map<String, Object> report(Actor actor);
+    Map<String, Object> report();
 
-    List<AuditLogResponse> audits(Actor actor);
+    List<AuditLogResponse> audits();
 }

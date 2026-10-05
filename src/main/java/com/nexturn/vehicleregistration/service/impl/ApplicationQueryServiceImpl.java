@@ -1,15 +1,12 @@
 package com.nexturn.vehicleregistration.service.impl;
 
-import com.nexturn.vehicleregistration.auth.Access;
-import com.nexturn.vehicleregistration.auth.Actor;
 import com.nexturn.vehicleregistration.dto.response.ApplicationDetailsResponse;
 import com.nexturn.vehicleregistration.dto.response.ApplicationPageResponse;
 import com.nexturn.vehicleregistration.dto.response.RegistrationCertificateResponse;
 import com.nexturn.vehicleregistration.dto.response.VehicleResponse;
 import com.nexturn.vehicleregistration.entity.RegistrationCertificate;
 import com.nexturn.vehicleregistration.entity.VehicleRegistrationApplication;
-import com.nexturn.vehicleregistration.enums.SessionRole;
-import com.nexturn.vehicleregistration.exception.AccessDeniedException;
+import com.nexturn.vehicleregistration.exception.ReferenceNumberNotFoundException;
 import com.nexturn.vehicleregistration.exception.RegistrationCertificateNotFoundException;
 import com.nexturn.vehicleregistration.mapper.ApplicationDetailsMapper;
 import com.nexturn.vehicleregistration.mapper.ApplicationSummaryMapper;
@@ -19,7 +16,6 @@ import com.nexturn.vehicleregistration.repository.ApplicationWorkflowRepository;
 import com.nexturn.vehicleregistration.repository.OwnerPaymentRepository;
 import com.nexturn.vehicleregistration.repository.RegistrationCertificateRepository;
 import com.nexturn.vehicleregistration.repository.VechileRepository;
-import com.nexturn.vehicleregistration.service.ApplicationAccessService;
 import com.nexturn.vehicleregistration.service.ApplicationQueryService;
 
 import java.util.List;
@@ -39,23 +35,17 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
     private final ApplicationWorkflowRepository applicationRepository;
     private final OwnerPaymentRepository paymentRepository;
     private final RegistrationCertificateRepository certificateRepository;
-    private final Access access;
-    private final ApplicationAccessService applicationAccessService;
 
     public ApplicationQueryServiceImpl(
             VechileRepository vehicleRepository,
             ApplicationWorkflowRepository applicationRepository,
             OwnerPaymentRepository paymentRepository,
-            RegistrationCertificateRepository certificateRepository,
-            Access access,
-            ApplicationAccessService applicationAccessService) {
+            RegistrationCertificateRepository certificateRepository) {
 
         this.vehicleRepository = vehicleRepository;
         this.applicationRepository = applicationRepository;
         this.paymentRepository = paymentRepository;
         this.certificateRepository = certificateRepository;
-        this.access = access;
-        this.applicationAccessService = applicationAccessService;
     }
 
     @Override
@@ -75,7 +65,7 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
     }
 
     @Override
-    public ApplicationPageResponse list(Actor actor, int page, int size) {
+    public ApplicationPageResponse list(Long ownerId, int page, int size) {
 
         Pageable pageable = PageRequest.of(
                 Math.max(0, page),
@@ -83,9 +73,9 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
                 Sort.by("submittedDate").descending());
 
         Page<VehicleRegistrationApplication> applications =
-                actor.role() == SessionRole.OWNER
+                ownerId != null
                         ? applicationRepository.findByApplicantOwnerId(
-                                actor.id(), pageable)
+                                ownerId, pageable)
                         : applicationRepository.findAll(pageable);
 
         return new ApplicationPageResponse(
@@ -99,21 +89,20 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 
     @Override
     public ApplicationDetailsResponse get(
-            String referenceNumber, Actor actor) {
+            String referenceNumber) {
 
         VehicleRegistrationApplication application =
-                applicationAccessService.readable(referenceNumber, actor);
+                applicationRepository.findById(referenceNumber)
+                        .orElseThrow(() -> new ReferenceNumberNotFoundException(referenceNumber));
 
         return detail(application);
     }
 
     @Override
-    public List<VehicleResponse> vehicles(Actor actor) {
+    public List<VehicleResponse> vehicles(Long ownerId) {
 
-        access.require(actor, SessionRole.OWNER);
-
-        return vehicleRepository
-                .findByCurrentOwnerOwnerId(actor.id())
+        return (ownerId == null ? vehicleRepository.findAll()
+                : vehicleRepository.findByCurrentOwnerOwnerId(ownerId))
                 .stream()
                 .map(VehicleMapper::toResponse)
                 .toList();
@@ -121,10 +110,11 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 
     @Override
     public RegistrationCertificateResponse certificate(
-            String referenceNumber, Actor actor) {
+            String referenceNumber) {
 
         VehicleRegistrationApplication application =
-                applicationAccessService.readable(referenceNumber, actor);
+                applicationRepository.findById(referenceNumber)
+                        .orElseThrow(() -> new ReferenceNumberNotFoundException(referenceNumber));
 
         String registrationNumber = application.getVehicle()
                 .getRegistrationcertificateNumber();
@@ -139,13 +129,7 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
                         () -> new RegistrationCertificateNotFoundException(
                                 registrationNumber));
 
-        if (actor.role() == SessionRole.OWNER
-                && !certificate.getRegisteredOwner()
-                        .getOwnerId().equals(actor.id())) {
 
-            throw new AccessDeniedException(
-                    "This registration certificate belongs to another owner");
-        }
 
         return RegistrationCertificateMapper.toResponse(certificate);
     }

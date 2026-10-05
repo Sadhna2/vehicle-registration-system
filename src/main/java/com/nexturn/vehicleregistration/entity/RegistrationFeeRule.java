@@ -1,9 +1,19 @@
 package com.nexturn.vehicleregistration.entity;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 import com.nexturn.vehicleregistration.enums.ApplicationType;
 import com.nexturn.vehicleregistration.enums.VehicleCategory;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "registration_fee_rules")
@@ -21,10 +31,10 @@ public class RegistrationFeeRule {
   private ApplicationType applicationType;
 
   @Column(precision = 10, scale = 2, nullable = false)
-  private java.math.BigDecimal feeAmount;
+  private BigDecimal feeAmount;
 
   @Column(nullable = false)
-  private java.time.LocalDate effectiveFrom;
+  private LocalDate effectiveFrom;
 
   public Long getFeeRuleId() {
     return feeRuleId;
@@ -50,19 +60,19 @@ public class RegistrationFeeRule {
     this.applicationType = value;
   }
 
-  public java.math.BigDecimal getFeeAmount() {
+  public BigDecimal getFeeAmount() {
     return feeAmount;
   }
 
-  public void setFeeAmount(java.math.BigDecimal value) {
+  public void setFeeAmount(BigDecimal value) {
     this.feeAmount = value;
   }
 
-  public java.time.LocalDate getEffectiveFrom() {
+  public LocalDate getEffectiveFrom() {
     return effectiveFrom;
   }
 
-  public void setEffectiveFrom(java.time.LocalDate value) {
+  public void setEffectiveFrom(LocalDate value) {
     this.effectiveFrom = value;
   }
 }

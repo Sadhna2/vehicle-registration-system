@@ -1,6 +1,5 @@
 package com.nexturn.vehicleregistration.service.impl;
 
-import com.nexturn.vehicleregistration.auth.Actor;
 import com.nexturn.vehicleregistration.entity.AuditLogs;
 import com.nexturn.vehicleregistration.entity.VehicleRegistrationApplication;
 import com.nexturn.vehicleregistration.repository.AuditLogRepository;
@@ -21,14 +20,13 @@ public class AuditServiceImpl implements AuditService {
 
     @Override
     public void record(
-            Actor actor,
             VehicleRegistrationApplication application,
             String action,
             String remarks) {
 
         AuditLogs auditLog = new AuditLogs();
 
-        auditLog.setActor(actor.role() + ":" + actor.id());
+        auditLog.setActor("PUBLIC");
 
         auditLog.setApplicationRefNo(
                 application == null

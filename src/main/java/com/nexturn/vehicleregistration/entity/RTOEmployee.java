@@ -1,10 +1,20 @@
 package com.nexturn.vehicleregistration.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.time.Instant;
+
 import com.nexturn.vehicleregistration.enums.AccountStatus;
 import com.nexturn.vehicleregistration.enums.RTOEmployeeDesignation;
 import com.nexturn.vehicleregistration.enums.RTOEmployeeRole;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "rta_employees")
@@ -25,7 +35,7 @@ public class RTOEmployee {
   @Column(nullable = false, length = 15)
   private String phoneNumber;
 
-  @com.fasterxml.jackson.annotation.JsonIgnore
+  @JsonIgnore
   @Column(nullable = false, length = 255)
   private String password;
 
@@ -42,7 +52,7 @@ public class RTOEmployee {
   private AccountStatus status = AccountStatus.ACTIVE;
 
   @Column(nullable = false)
-  private java.time.Instant dateOfJoining = java.time.Instant.now();
+  private Instant dateOfJoining = Instant.now();
 
   public Long getEmployeeId() {
     return employeeId;
@@ -116,11 +126,11 @@ public class RTOEmployee {
     this.status = value;
   }
 
-  public java.time.Instant getDateOfJoining() {
+  public Instant getDateOfJoining() {
     return dateOfJoining;
   }
 
-  public void setDateOfJoining(java.time.Instant value) {
+  public void setDateOfJoining(Instant value) {
     this.dateOfJoining = value;
   }
 }

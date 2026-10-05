@@ -1,5 +1,6 @@
 package com.nexturn.vehicleregistration.exception;
 
+import java.util.Map;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -33,27 +35,27 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler({
-    AccessDeniedException.class,
+
     ApplicationIdNotFoundException.class,
-    CorsConfigurationException.class,
+
     DuplicateRecordException.class,
     EmployeeNotFoundException.class,
     FeeRuleNotFoundException.class,
     InspectionNotPassedException.class,
-    InvalidLoginException.class,
+
     InvalidOperationException.class,
     InvalidRequestException.class,
-    InvalidTokenException.class,
-    JwtConfigurationException.class,
-    JwtSigningException.class,
-    OwnerNotFoundException.class,
+    InvalidLoginException.class,
     PasswordHashException.class,
+
+    OwnerNotFoundException.class,
+
     PaymentAmountMismatchException.class,
     PaymentRequiredException.class,
     RecordNotFoundException.class,
     ReferenceNumberNotFoundException.class,
-    RegistrationCertificateNotFoundException.class,
-    TokenExpiredException.class
+    RegistrationCertificateNotFoundException.class
+
   })
   public ResponseEntity<ProblemDetail> applicationError(RuntimeException error) {
     ApiError details = (ApiError) error;
@@ -76,7 +78,7 @@ public class GlobalExceptionHandler {
         error.getBindingResult().getFieldErrors().stream()
             .map(
                 field ->
-                    java.util.Map.of(
+                    Map.of(
                         "field",
                         field.getField(),
                         "message",
@@ -96,7 +98,8 @@ public class GlobalExceptionHandler {
     HttpMessageNotReadableException.class,
     MethodArgumentTypeMismatchException.class,
     ConstraintViolationException.class,
-    HandlerMethodValidationException.class
+    HandlerMethodValidationException.class,
+    MissingServletRequestParameterException.class
   })
   public ResponseEntity<ProblemDetail> malformed(Exception error) {
     return problem(

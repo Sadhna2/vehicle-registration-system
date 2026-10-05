@@ -1,11 +1,13 @@
-package com.nexturn.vehicleregistration.auth;
+package com.nexturn.vehicleregistration.util;
 
-import java.security.*;
-import java.util.*;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
+import java.util.Base64;
+import com.nexturn.vehicleregistration.exception.PasswordHashException;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
-public final class Passwords {
+public final class PasswordUtil {
   public static String hash(String value) {
     byte[] salt = new byte[16];
     new SecureRandom().nextBytes(salt);
@@ -20,7 +22,7 @@ public final class Passwords {
           .generateSecret(new PBEKeySpec(value.toCharArray(), salt, 210000, 256))
           .getEncoded();
     } catch (Exception e) {
-      throw new com.nexturn.vehicleregistration.exception.PasswordHashException(e);
+      throw new PasswordHashException(e);
     }
   }
 

@@ -1,16 +1,12 @@
 package com.nexturn.vehicleregistration.controller;
 
-import com.nexturn.vehicleregistration.auth.Access;
-import com.nexturn.vehicleregistration.auth.ApiRequest;
 import com.nexturn.vehicleregistration.dto.request.ApplicationReviewRequest;
 import com.nexturn.vehicleregistration.dto.request.NewVehicleRegistrationRequest;
-import com.nexturn.vehicleregistration.dto.request.RequestInfo;
 import com.nexturn.vehicleregistration.dto.response.ApplicationDetailsResponse;
 import com.nexturn.vehicleregistration.dto.response.ApplicationPageResponse;
 import com.nexturn.vehicleregistration.service.VehicleRegistrationApplicationService;
-
 import jakarta.validation.Valid;
-
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,69 +17,43 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@CrossOrigin(origins = {"http://localhost:5173", "http://127.0.0.1:5173"})
 @RequestMapping("/api/applications")
 public class VehicleRegistrationApplicationController {
-
     private final VehicleRegistrationApplicationService applicationService;
-    private final Access access;
 
-    public VehicleRegistrationApplicationController(
-            VehicleRegistrationApplicationService applicationService,
-            Access access) {
-
+    public VehicleRegistrationApplicationController(VehicleRegistrationApplicationService applicationService) {
         this.applicationService = applicationService;
-        this.access = access;
     }
 
     @GetMapping
-    public ApplicationPageResponse list(
-            @ApiRequest RequestInfo requestInfo,
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "20") int size) {
-
-        return applicationService.list(
-                access.actor(requestInfo), page, size);
+    public ApplicationPageResponse list(@RequestParam(name="ownerId", required=false) Long ownerId,
+            @RequestParam(name="page", defaultValue="0") int page,
+            @RequestParam(name="size", defaultValue="20") int size) {
+        return applicationService.list(ownerId, page, size);
     }
 
     @PostMapping
-    public ApplicationDetailsResponse submit(
-            @ApiRequest RequestInfo requestInfo,
+    public ApplicationDetailsResponse submit(@RequestParam("ownerId") Long ownerId,
             @Valid @RequestBody NewVehicleRegistrationRequest request) {
-
-        return applicationService.submit(
-                request, access.actor(requestInfo));
+        return applicationService.submit(request, ownerId);
     }
 
     @GetMapping("/{ref}")
-    public ApplicationDetailsResponse get(
-            @ApiRequest RequestInfo requestInfo,
-            @PathVariable("ref") String referenceNumber) {
-
-        return applicationService.get(
-                referenceNumber, access.actor(requestInfo));
+    public ApplicationDetailsResponse get(@PathVariable("ref") String referenceNumber) {
+        return applicationService.get(referenceNumber);
     }
 
     @PutMapping("/{ref}/correction")
-    public ApplicationDetailsResponse correct(
-            @ApiRequest RequestInfo requestInfo,
-            @PathVariable("ref") String referenceNumber,
+    public ApplicationDetailsResponse correct(@PathVariable("ref") String referenceNumber,
             @Valid @RequestBody NewVehicleRegistrationRequest request) {
-
-        return applicationService.correct(
-                referenceNumber,
-                request,
-                access.actor(requestInfo));
+        return applicationService.correct(referenceNumber, request);
     }
 
     @PostMapping("/{ref}/review")
-    public ApplicationDetailsResponse review(
-            @ApiRequest RequestInfo requestInfo,
-            @PathVariable("ref") String referenceNumber,
+    public ApplicationDetailsResponse review(@PathVariable("ref") String referenceNumber,
+            @RequestParam("employeeId") Long employeeId,
             @Valid @RequestBody ApplicationReviewRequest request) {
-
-        return applicationService.review(
-                referenceNumber,
-                request,
-                access.actor(requestInfo));
+        return applicationService.review(referenceNumber, request, employeeId);
     }
 }

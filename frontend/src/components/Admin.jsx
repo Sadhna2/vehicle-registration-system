@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { api, categories, label, money } from "../api";
 import Form from "./Form";
-export default function Admin({ actor, run, busy }) {
+export default function Admin({ user, run, busy, onError }) {
   const [report, setReport] = useState(null),
     [fees, setFees] = useState([]),
     [logs, setLogs] = useState([]),
     [employees, setEmployees] = useState([]),
     [owners, setOwners] = useState([]);
-  const load = useCallback(async () => {
+  const load = async () => {
     const [r, f, l, e] = await Promise.all([
       api("/reports"),
       api("/fees"),
@@ -18,11 +18,11 @@ export default function Admin({ actor, run, busy }) {
     setFees(f);
     setLogs(l);
     setEmployees(e);
-    if (actor.role === "SYSTEM_ADMIN") setOwners(await api("/owners"));
-  }, [actor.role]);
+    if (user.role === "SYSTEM_ADMIN") setOwners(await api("/owners"));
+  };
   useEffect(() => {
-    run(load);
-  }, [load, run]);
+    load().catch(onError);
+  }, [user.role, onError]);
   const save = (path, data) =>
     run(async () => {
       await api(path, "POST", data);
@@ -64,7 +64,7 @@ export default function Admin({ actor, run, busy }) {
           </div>
         </section>
       )}
-      {actor.role === "RTO_ADMIN" && (
+      {user.role === "RTO_ADMIN" && (
         <section className="card p-4">
           <h2>Fee rules</h2>
           <p className="text-secondary">
@@ -127,7 +127,7 @@ export default function Admin({ actor, run, busy }) {
             {
               name: "role",
               options:
-                actor.role === "SYSTEM_ADMIN"
+                user.role === "SYSTEM_ADMIN"
                   ? ["RTO_OFFICER", "RTO_ADMIN", "SYSTEM_ADMIN"]
                   : ["RTO_OFFICER"],
             },
@@ -152,8 +152,8 @@ export default function Admin({ actor, run, busy }) {
                   </td>
                   <td>{e.emailAddress}</td>
                   <td>
-                    {actor.role === "SYSTEM_ADMIN" &&
-                    e.employeeId !== actor.id ? (
+                    {user.role === "SYSTEM_ADMIN" &&
+                    e.employeeId !== user.id ? (
                       <select
                         aria-label={`Role for ${e.emailAddress}`}
                         className="form-select"
@@ -174,8 +174,8 @@ export default function Admin({ actor, run, busy }) {
                     )}
                   </td>
                   <td>
-                    {actor.role === "SYSTEM_ADMIN" &&
-                    e.employeeId !== actor.id ? (
+                    {user.role === "SYSTEM_ADMIN" &&
+                    e.employeeId !== user.id ? (
                       <select
                         aria-label={`Status for ${e.emailAddress}`}
                         className="form-select"
@@ -199,7 +199,7 @@ export default function Admin({ actor, run, busy }) {
           </table>
         </div>
       </section>
-      {actor.role === "SYSTEM_ADMIN" && (
+      {user.role === "SYSTEM_ADMIN" && (
         <section className="card p-4">
           <h2>Owner accounts</h2>
           <p className="text-secondary">
@@ -248,7 +248,7 @@ export default function Admin({ actor, run, busy }) {
             <thead>
               <tr>
                 <th>Time</th>
-                <th>Actor</th>
+                <th>Source</th>
                 <th>Action</th>
                 <th>Application / remarks</th>
               </tr>

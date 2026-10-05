@@ -1,7 +1,11 @@
 package com.nexturn.vehicleregistration.dto.request;
 
-import com.nexturn.vehicleregistration.enums.*;
-import jakarta.validation.constraints.*;
+import com.nexturn.vehicleregistration.enums.FuelType;
+import com.nexturn.vehicleregistration.enums.VehicleCategory;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public record NewVehicleRegistrationRequest(
     @NotNull VehicleCategory vehicleCategory,

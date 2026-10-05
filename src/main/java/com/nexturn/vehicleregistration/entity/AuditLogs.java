@@ -1,7 +1,12 @@
 package com.nexturn.vehicleregistration.entity;
 
-
-import jakarta.persistence.*;
+import java.time.Instant;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "audit_logs")
@@ -9,15 +14,12 @@ public class AuditLogs {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
   private String actor;
   private String action;
   private String applicationRefNo;
-
   @Column(length = 500)
   private String remarks;
-
-  private java.time.Instant createdAt = java.time.Instant.now();
+  private Instant createdAt = Instant.now();
 
   public Long getId() {
     return id;
@@ -59,11 +61,11 @@ public class AuditLogs {
     this.remarks = value;
   }
 
-  public java.time.Instant getCreatedAt() {
+  public Instant getCreatedAt() {
     return createdAt;
   }
 
-  public void setCreatedAt(java.time.Instant value) {
+  public void setCreatedAt(Instant value) {
     this.createdAt = value;
   }
 }
