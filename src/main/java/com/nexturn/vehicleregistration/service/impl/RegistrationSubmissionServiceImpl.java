@@ -1,7 +1,6 @@
 package com.nexturn.vehicleregistration.service.impl;
 
 import static com.nexturn.vehicleregistration.service.WorkflowSupport.ensure;
-
 import com.nexturn.vehicleregistration.dto.request.NewVehicleRegistrationRequest;
 import com.nexturn.vehicleregistration.dto.response.ApplicationDetailsResponse;
 import com.nexturn.vehicleregistration.entity.Owner;
@@ -20,14 +19,13 @@ import com.nexturn.vehicleregistration.repository.VechileRepository;
 import com.nexturn.vehicleregistration.service.ApplicationQueryService;
 import com.nexturn.vehicleregistration.service.AuditService;
 import com.nexturn.vehicleregistration.service.RegistrationSubmissionService;
-
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Year;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,28 +34,23 @@ import org.springframework.transaction.annotation.Transactional;
 public class RegistrationSubmissionServiceImpl
         implements RegistrationSubmissionService {
 
-    private final OwnerRepository ownerRepository;
-    private final VechileRepository vehicleRepository;
-    private final ApplicationWorkflowRepository applicationRepository;
-    private final RegistrationFeeRuleRepository feeRuleRepository;
-    private final ApplicationQueryService applicationQueryService;
-    private final AuditService auditService;
+    @Autowired
+    private OwnerRepository ownerRepository;
 
-    public RegistrationSubmissionServiceImpl(
-            OwnerRepository ownerRepository,
-            VechileRepository vehicleRepository,
-            ApplicationWorkflowRepository applicationRepository,
-            RegistrationFeeRuleRepository feeRuleRepository,
-            ApplicationQueryService applicationQueryService,
-            AuditService auditService) {
+    @Autowired
+    private VechileRepository vehicleRepository;
 
-        this.ownerRepository = ownerRepository;
-        this.vehicleRepository = vehicleRepository;
-        this.applicationRepository = applicationRepository;
-        this.feeRuleRepository = feeRuleRepository;
-        this.applicationQueryService = applicationQueryService;
-        this.auditService = auditService;
-    }
+    @Autowired
+    private ApplicationWorkflowRepository applicationRepository;
+
+    @Autowired
+    private RegistrationFeeRuleRepository feeRuleRepository;
+
+    @Autowired
+    private ApplicationQueryService applicationQueryService;
+
+    @Autowired
+    private AuditService auditService;
 
     @Override
     public ApplicationDetailsResponse submit(

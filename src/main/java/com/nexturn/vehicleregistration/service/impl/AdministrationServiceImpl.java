@@ -11,28 +11,22 @@ import com.nexturn.vehicleregistration.service.AdministrationService;
 import com.nexturn.vehicleregistration.service.RTOEmployeeService;
 import com.nexturn.vehicleregistration.service.RegistrationFeeRuleService;
 import com.nexturn.vehicleregistration.service.ReportService;
-
 import java.util.List;
 import java.util.Map;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AdministrationServiceImpl implements AdministrationService {
 
-    private final RegistrationFeeRuleService registrationFeeRuleService;
-    private final RTOEmployeeService employeeService;
-    private final ReportService reportService;
+    @Autowired
+    private RegistrationFeeRuleService registrationFeeRuleService;
 
-    public AdministrationServiceImpl(
-            RegistrationFeeRuleService registrationFeeRuleService,
-            RTOEmployeeService employeeService,
-            ReportService reportService) {
+    @Autowired
+    private RTOEmployeeService employeeService;
 
-        this.registrationFeeRuleService = registrationFeeRuleService;
-        this.employeeService = employeeService;
-        this.reportService = reportService;
-    }
+    @Autowired
+    private ReportService reportService;
 
     @Override
     public List<RegistrationFeeRuleResponse> fees() {

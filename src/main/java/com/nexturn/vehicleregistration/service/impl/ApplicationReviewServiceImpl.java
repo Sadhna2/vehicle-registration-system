@@ -1,7 +1,6 @@
 package com.nexturn.vehicleregistration.service.impl;
 
 import static com.nexturn.vehicleregistration.service.WorkflowSupport.ensure;
-
 import com.nexturn.vehicleregistration.dto.request.ApplicationReviewRequest;
 import com.nexturn.vehicleregistration.dto.response.ApplicationDetailsResponse;
 import com.nexturn.vehicleregistration.entity.RTOEmployee;
@@ -25,10 +24,9 @@ import com.nexturn.vehicleregistration.repository.RegistrationCertificateReposit
 import com.nexturn.vehicleregistration.service.ApplicationQueryService;
 import com.nexturn.vehicleregistration.service.ApplicationReviewService;
 import com.nexturn.vehicleregistration.service.AuditService;
-
 import java.time.Instant;
 import java.time.LocalDate;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,31 +35,26 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ApplicationReviewServiceImpl implements ApplicationReviewService {
 
-    private final RTOEmployeeRepository employeeRepository;
-    private final ApplicationWorkflowRepository applicationRepository;
-    private final OwnerPaymentRepository paymentRepository;
-    private final RegistrationCertificateRepository certificateRepository;
-    private final ApplicationQueryService applicationQueryService;
-    private final AuditService auditService;
+    @Autowired
+    private RTOEmployeeRepository employeeRepository;
+
+    @Autowired
+    private ApplicationWorkflowRepository applicationRepository;
+
+    @Autowired
+    private OwnerPaymentRepository paymentRepository;
+
+    @Autowired
+    private RegistrationCertificateRepository certificateRepository;
+
+    @Autowired
+    private ApplicationQueryService applicationQueryService;
+
+    @Autowired
+    private AuditService auditService;
 
     @Value("${vrs.registration.validity-years:15}")
     private int registrationYears;
-
-    public ApplicationReviewServiceImpl(
-            RTOEmployeeRepository employeeRepository,
-            ApplicationWorkflowRepository applicationRepository,
-            OwnerPaymentRepository paymentRepository,
-            RegistrationCertificateRepository certificateRepository,
-            ApplicationQueryService applicationQueryService,
-            AuditService auditService) {
-
-        this.employeeRepository = employeeRepository;
-        this.applicationRepository = applicationRepository;
-        this.paymentRepository = paymentRepository;
-        this.certificateRepository = certificateRepository;
-        this.applicationQueryService = applicationQueryService;
-        this.auditService = auditService;
-    }
 
     @Override
     public ApplicationDetailsResponse review(

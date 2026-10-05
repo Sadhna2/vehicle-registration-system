@@ -1,22 +1,21 @@
 package com.nexturn.vehicleregistration.service.impl;
 
 import com.nexturn.vehicleregistration.dto.response.AuditLogResponse;
+import com.nexturn.vehicleregistration.entity.AuditLogs;
 import com.nexturn.vehicleregistration.enums.ApplicationStatus;
 import com.nexturn.vehicleregistration.enums.PaymentStatus;
-import com.nexturn.vehicleregistration.mapper.AuditLogMapper;
 import com.nexturn.vehicleregistration.repository.ApplicationWorkflowRepository;
 import com.nexturn.vehicleregistration.repository.AuditLogRepository;
 import com.nexturn.vehicleregistration.repository.OwnerPaymentRepository;
 import com.nexturn.vehicleregistration.repository.OwnerRepository;
 import com.nexturn.vehicleregistration.repository.VechileRepository;
 import com.nexturn.vehicleregistration.service.ReportService;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -26,25 +25,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ReportServiceImpl implements ReportService {
 
-    private final OwnerRepository ownerRepository;
-    private final VechileRepository vehicleRepository;
-    private final ApplicationWorkflowRepository applicationRepository;
-    private final OwnerPaymentRepository paymentRepository;
-    private final AuditLogRepository auditLogRepository;
+    @Autowired
+    private OwnerRepository ownerRepository;
 
-    public ReportServiceImpl(
-            OwnerRepository ownerRepository,
-            VechileRepository vehicleRepository,
-            ApplicationWorkflowRepository applicationRepository,
-            OwnerPaymentRepository paymentRepository,
-            AuditLogRepository auditLogRepository) {
+    @Autowired
+    private VechileRepository vehicleRepository;
 
-        this.ownerRepository = ownerRepository;
-        this.vehicleRepository = vehicleRepository;
-        this.applicationRepository = applicationRepository;
-        this.paymentRepository = paymentRepository;
-        this.auditLogRepository = auditLogRepository;
-    }
+    @Autowired
+    private ApplicationWorkflowRepository applicationRepository;
+
+    @Autowired
+    private OwnerPaymentRepository paymentRepository;
+
+    @Autowired
+    private AuditLogRepository auditLogRepository;
 
     @Override
     public Map<String, Object> report() {
@@ -87,7 +81,17 @@ public class ReportServiceImpl implements ReportService {
                                 Sort.by("createdAt").descending()))
                 .getContent()
                 .stream()
-                .map(AuditLogMapper::toResponse)
+                .map(this::toAuditResponse)
                 .toList();
+    }
+
+    private AuditLogResponse toAuditResponse(AuditLogs a) {
+        return new AuditLogResponse(
+                a.getId(),
+                a.getActor(),
+                a.getAction(),
+                a.getApplicationRefNo(),
+                a.getRemarks(),
+                a.getCreatedAt());
     }
 }

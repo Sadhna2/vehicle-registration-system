@@ -6,6 +6,7 @@ import com.nexturn.vehicleregistration.dto.response.ApplicationDetailsResponse;
 import com.nexturn.vehicleregistration.dto.response.ApplicationPageResponse;
 import com.nexturn.vehicleregistration.service.VehicleRegistrationApplicationService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,13 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin(origins = {"http://localhost:5173", "http://127.0.0.1:5173"})
-@RequestMapping("/api/applications")
+    @RequestMapping("/api/applications")
 public class VehicleRegistrationApplicationController {
-    private final VehicleRegistrationApplicationService applicationService;
-
-    public VehicleRegistrationApplicationController(VehicleRegistrationApplicationService applicationService) {
-        this.applicationService = applicationService;
-    }
+    @Autowired
+    private VehicleRegistrationApplicationService applicationService;
 
     @GetMapping
     public ApplicationPageResponse list(@RequestParam(name="ownerId", required=false) Long ownerId,

@@ -9,6 +9,7 @@ import com.nexturn.vehicleregistration.service.AdministrationService;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -20,13 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin(origins = {"http://localhost:5173", "http://127.0.0.1:5173"})
-@RequestMapping("/api")
+    @RequestMapping("/api")
 public class AdministrationController {
-    private final AdministrationService administrationService;
-
-    public AdministrationController(AdministrationService administrationService) {
-        this.administrationService = administrationService;
-    }
+    @Autowired
+    private AdministrationService administrationService;
 
     @GetMapping("/reports")
     public Map<String,Object> report() { return administrationService.report(); }

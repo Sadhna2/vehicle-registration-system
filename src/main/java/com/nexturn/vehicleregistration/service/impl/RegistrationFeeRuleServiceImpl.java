@@ -1,18 +1,15 @@
 package com.nexturn.vehicleregistration.service.impl;
 
 import static com.nexturn.vehicleregistration.service.WorkflowSupport.ensure;
-
 import com.nexturn.vehicleregistration.dto.request.RegistrationFeeRuleRequest;
 import com.nexturn.vehicleregistration.dto.response.RegistrationFeeRuleResponse;
 import com.nexturn.vehicleregistration.entity.RegistrationFeeRule;
 import com.nexturn.vehicleregistration.enums.ApplicationType;
-import com.nexturn.vehicleregistration.mapper.RegistrationFeeRuleMapper;
 import com.nexturn.vehicleregistration.repository.RegistrationFeeRuleRepository;
 import com.nexturn.vehicleregistration.service.AuditService;
 import com.nexturn.vehicleregistration.service.RegistrationFeeRuleService;
-
 import java.util.List;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,16 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class RegistrationFeeRuleServiceImpl
         implements RegistrationFeeRuleService {
 
-    private final RegistrationFeeRuleRepository feeRuleRepository;
-    private final AuditService auditService;
+    @Autowired
+    private RegistrationFeeRuleRepository feeRuleRepository;
 
-    public RegistrationFeeRuleServiceImpl(
-            RegistrationFeeRuleRepository feeRuleRepository,
-            AuditService auditService) {
-
-        this.feeRuleRepository = feeRuleRepository;
-        this.auditService = auditService;
-    }
+    @Autowired
+    private AuditService auditService;
 
     @Override
     @Transactional(readOnly = true)
@@ -41,7 +33,7 @@ public class RegistrationFeeRuleServiceImpl
                 .findAll(Sort.by("effectiveFrom").descending())
                 .stream()
                 .filter(rule -> rule.getApplicationType() == ApplicationType.NEW)
-                .map(RegistrationFeeRuleMapper::toResponse)
+                .map(this::toFeeResponse)
                 .toList();
     }
 
@@ -67,6 +59,15 @@ public class RegistrationFeeRuleServiceImpl
                 "FEE_CREATED",
                 ApplicationType.NEW.name());
 
-        return RegistrationFeeRuleMapper.toResponse(savedFeeRule);
+        return toFeeResponse(savedFeeRule);
+    }
+
+    private RegistrationFeeRuleResponse toFeeResponse(RegistrationFeeRule f) {
+        return new RegistrationFeeRuleResponse(
+                f.getFeeRuleId(),
+                f.getVehicleCategory(),
+                f.getApplicationType(),
+                f.getFeeAmount(),
+                f.getEffectiveFrom());
     }
 }

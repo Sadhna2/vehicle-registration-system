@@ -5,6 +5,7 @@ import com.nexturn.vehicleregistration.dto.response.RegistrationFeeRuleResponse;
 import com.nexturn.vehicleregistration.service.AdministrationService;
 import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,13 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin(origins = {"http://localhost:5173", "http://127.0.0.1:5173"})
-@RequestMapping("/api/fees")
+    @RequestMapping("/api/fees")
 public class RegistrationFeeRuleController {
-    private final AdministrationService administrationService;
-
-    public RegistrationFeeRuleController(AdministrationService administrationService) {
-        this.administrationService = administrationService;
-    }
+    @Autowired
+    private AdministrationService administrationService;
 
     @GetMapping
     public List<RegistrationFeeRuleResponse> fees() { return administrationService.fees(); }

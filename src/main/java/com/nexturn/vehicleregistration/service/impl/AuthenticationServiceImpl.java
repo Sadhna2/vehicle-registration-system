@@ -1,9 +1,8 @@
 package com.nexturn.vehicleregistration.service.impl;
 
-import com.nexturn.vehicleregistration.dto.response.LoginResponse;
-import com.nexturn.vehicleregistration.util.PasswordUtil;
 import com.nexturn.vehicleregistration.dto.request.LoginRequest;
 import com.nexturn.vehicleregistration.dto.request.OwnerRequest;
+import com.nexturn.vehicleregistration.dto.response.LoginResponse;
 import com.nexturn.vehicleregistration.entity.Owner;
 import com.nexturn.vehicleregistration.entity.RTOEmployee;
 import com.nexturn.vehicleregistration.enums.AccountStatus;
@@ -12,9 +11,9 @@ import com.nexturn.vehicleregistration.exception.InvalidLoginException;
 import com.nexturn.vehicleregistration.repository.OwnerRepository;
 import com.nexturn.vehicleregistration.repository.RTOEmployeeRepository;
 import com.nexturn.vehicleregistration.service.AuthenticationService;
-
+import com.nexturn.vehicleregistration.util.PasswordUtil;
 import java.util.Locale;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,16 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class AuthenticationServiceImpl implements AuthenticationService {
 
-    private final OwnerRepository ownerRepository;
-    private final RTOEmployeeRepository employeeRepository;
+    @Autowired
+    private OwnerRepository ownerRepository;
 
-    public AuthenticationServiceImpl(
-            OwnerRepository ownerRepository,
-            RTOEmployeeRepository employeeRepository) {
-
-        this.ownerRepository = ownerRepository;
-        this.employeeRepository = employeeRepository;
-    }
+    @Autowired
+    private RTOEmployeeRepository employeeRepository;
 
     @Override
     @Transactional

@@ -12,31 +12,25 @@ import com.nexturn.vehicleregistration.service.ApplicationReviewService;
 import com.nexturn.vehicleregistration.service.PaymentService;
 import com.nexturn.vehicleregistration.service.RegistrationSubmissionService;
 import com.nexturn.vehicleregistration.service.VehicleRegistrationApplicationService;
-
 import java.util.List;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class VehicleRegistrationApplicationServiceImpl
         implements VehicleRegistrationApplicationService {
 
-    private final RegistrationSubmissionService registrationSubmissionService;
-    private final PaymentService paymentService;
-    private final ApplicationReviewService applicationReviewService;
-    private final ApplicationQueryService applicationQueryService;
+    @Autowired
+    private RegistrationSubmissionService registrationSubmissionService;
 
-    public VehicleRegistrationApplicationServiceImpl(
-            RegistrationSubmissionService registrationSubmissionService,
-            PaymentService paymentService,
-            ApplicationReviewService applicationReviewService,
-            ApplicationQueryService applicationQueryService) {
+    @Autowired
+    private PaymentService paymentService;
 
-        this.registrationSubmissionService = registrationSubmissionService;
-        this.paymentService = paymentService;
-        this.applicationReviewService = applicationReviewService;
-        this.applicationQueryService = applicationQueryService;
-    }
+    @Autowired
+    private ApplicationReviewService applicationReviewService;
+
+    @Autowired
+    private ApplicationQueryService applicationQueryService;
 
     @Override
     public ApplicationDetailsResponse submit(

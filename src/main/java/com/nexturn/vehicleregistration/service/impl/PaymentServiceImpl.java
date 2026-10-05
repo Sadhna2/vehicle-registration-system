@@ -1,7 +1,6 @@
 package com.nexturn.vehicleregistration.service.impl;
 
 import static com.nexturn.vehicleregistration.service.WorkflowSupport.ensure;
-
 import com.nexturn.vehicleregistration.dto.request.PaymentRequest;
 import com.nexturn.vehicleregistration.dto.response.ApplicationDetailsResponse;
 import com.nexturn.vehicleregistration.entity.OwnerPaymentDetail;
@@ -15,10 +14,9 @@ import com.nexturn.vehicleregistration.repository.OwnerPaymentRepository;
 import com.nexturn.vehicleregistration.service.ApplicationQueryService;
 import com.nexturn.vehicleregistration.service.AuditService;
 import com.nexturn.vehicleregistration.service.PaymentService;
-
 import java.time.Instant;
 import java.util.UUID;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,22 +24,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class PaymentServiceImpl implements PaymentService {
 
-    private final ApplicationWorkflowRepository applicationRepository;
-    private final OwnerPaymentRepository paymentRepository;
-    private final ApplicationQueryService applicationQueryService;
-    private final AuditService auditService;
+    @Autowired
+    private ApplicationWorkflowRepository applicationRepository;
 
-    public PaymentServiceImpl(
-            ApplicationWorkflowRepository applicationRepository,
-            OwnerPaymentRepository paymentRepository,
-            ApplicationQueryService applicationQueryService,
-            AuditService auditService) {
+    @Autowired
+    private OwnerPaymentRepository paymentRepository;
 
-        this.applicationRepository = applicationRepository;
-        this.paymentRepository = paymentRepository;
-        this.applicationQueryService = applicationQueryService;
-        this.auditService = auditService;
-    }
+    @Autowired
+    private ApplicationQueryService applicationQueryService;
+
+    @Autowired
+    private AuditService auditService;
 
     @Override
     public ApplicationDetailsResponse pay(

@@ -1,29 +1,25 @@
 package com.nexturn.vehicleregistration.service.impl;
 
 import static com.nexturn.vehicleregistration.service.WorkflowSupport.ensure;
-
 import com.nexturn.vehicleregistration.dto.request.AccountRequest;
 import com.nexturn.vehicleregistration.dto.request.RTOEmployeeRequest;
 import com.nexturn.vehicleregistration.dto.response.OwnerResponse;
 import com.nexturn.vehicleregistration.dto.response.RTOEmployeeResponse;
 import com.nexturn.vehicleregistration.entity.Owner;
 import com.nexturn.vehicleregistration.entity.RTOEmployee;
-import com.nexturn.vehicleregistration.util.PasswordUtil;
 import com.nexturn.vehicleregistration.exception.DuplicateRecordException;
 import com.nexturn.vehicleregistration.exception.EmployeeNotFoundException;
 import com.nexturn.vehicleregistration.exception.InvalidRequestException;
 import com.nexturn.vehicleregistration.exception.OwnerNotFoundException;
-import com.nexturn.vehicleregistration.mapper.OwnerMapper;
-import com.nexturn.vehicleregistration.mapper.RTOEmployeeMapper;
 import com.nexturn.vehicleregistration.repository.OwnerRepository;
 import com.nexturn.vehicleregistration.repository.RTOEmployeeRepository;
 import com.nexturn.vehicleregistration.service.AuditService;
 import com.nexturn.vehicleregistration.service.RTOEmployeeService;
-
+import com.nexturn.vehicleregistration.util.PasswordUtil;
 import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,19 +27,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class RTOEmployeeServiceImpl implements RTOEmployeeService {
 
-    private final OwnerRepository ownerRepository;
-    private final RTOEmployeeRepository employeeRepository;
-    private final AuditService auditService;
+    @Autowired
+    private OwnerRepository ownerRepository;
 
-    public RTOEmployeeServiceImpl(
-            OwnerRepository ownerRepository,
-            RTOEmployeeRepository employeeRepository,
-            AuditService auditService) {
+    @Autowired
+    private RTOEmployeeRepository employeeRepository;
 
-        this.ownerRepository = ownerRepository;
-        this.employeeRepository = employeeRepository;
-        this.auditService = auditService;
-    }
+    @Autowired
+    private AuditService auditService;
 
     @Override
     @Transactional(readOnly = true)
@@ -51,7 +42,7 @@ public class RTOEmployeeServiceImpl implements RTOEmployeeService {
 
         return employeeRepository.findAll()
                 .stream()
-                .map(RTOEmployeeMapper::toResponse)
+                .map(this::toEmployeeResponse)
                 .toList();
     }
 
@@ -87,7 +78,7 @@ public class RTOEmployeeServiceImpl implements RTOEmployeeService {
                 "EMPLOYEE_CREATED",
                 savedEmployee.getEmailAddress());
 
-        return RTOEmployeeMapper.toResponse(savedEmployee);
+        return toEmployeeResponse(savedEmployee);
     }
 
     @Override
@@ -96,7 +87,7 @@ public class RTOEmployeeServiceImpl implements RTOEmployeeService {
 
         return ownerRepository.findAll()
                 .stream()
-                .map(OwnerMapper::toResponse)
+                .map(this::toOwnerResponse)
                 .toList();
     }
 
@@ -148,4 +139,48 @@ public class RTOEmployeeServiceImpl implements RTOEmployeeService {
 
         employee.setStatus(request.status());
     }
+
+    private OwnerResponse toOwnerResponse(Owner owner) {
+
+                if (owner == null) {
+                        return null;
+                }
+
+                return new OwnerResponse(
+                                owner.getOwnerId(),
+                                owner.getFirstName(),
+                                owner.getLastName(),
+                                owner.getEmailAddress(),
+                                owner.getPhoneNumber(),
+                                owner.getDateOfBirth(),
+                                owner.getIdentityProofType(),
+                                owner.getIdentityProofNumber(),
+                                owner.getAddress(),
+                                owner.getCityName(),
+                                owner.getStateName(),
+                                owner.getPincode(),
+                                owner.getStatus(),
+                                owner.getDateOfCreation(),
+                                owner.getDateOfUpdate()
+                );
+        }
+
+    private RTOEmployeeResponse toEmployeeResponse(RTOEmployee employee) {
+
+                if (employee == null) {
+                        return null;
+                }
+
+                return new RTOEmployeeResponse(
+                                employee.getEmployeeId(),
+                                employee.getFirstName(),
+                                employee.getLastName(),
+                                employee.getEmailAddress(),
+                                employee.getPhoneNumber(),
+                                employee.getDesignation(),
+                                employee.getRole(),
+                                employee.getStatus(),
+                                employee.getDateOfJoining()
+                );
+        }
 }

@@ -4,7 +4,7 @@ import com.nexturn.vehicleregistration.entity.AuditLogs;
 import com.nexturn.vehicleregistration.entity.VehicleRegistrationApplication;
 import com.nexturn.vehicleregistration.repository.AuditLogRepository;
 import com.nexturn.vehicleregistration.service.AuditService;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,11 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AuditServiceImpl implements AuditService {
 
-    private final AuditLogRepository auditLogRepository;
-
-    public AuditServiceImpl(AuditLogRepository auditLogRepository) {
-        this.auditLogRepository = auditLogRepository;
-    }
+    @Autowired
+    private AuditLogRepository auditLogRepository;
 
     @Override
     public void record(
