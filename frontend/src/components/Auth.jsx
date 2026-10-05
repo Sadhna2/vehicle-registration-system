@@ -229,11 +229,7 @@ export default function Auth({ onLogin, run, busy }) {
                 : "Create an owner account"}
           </button>
         </div>
-        <p className="auth-help">
-          {staff && !signup
-            ? "Sign in with your employee details, or create an employee account."
-            : "Keep your identity details, chassis number, and engine number ready."}
-        </p>
+        
       </section>
     </main>
   );

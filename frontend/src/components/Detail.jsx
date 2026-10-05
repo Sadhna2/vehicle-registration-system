@@ -108,8 +108,7 @@ export default function Detail({ data, user, run, busy, onChange, onClose }) {
         <div className="border-top py-3">
           <h3>Record simulated payment</h3>
           <p className="small text-secondary">
-            Enter only the final four card digits. This demo does not charge a
-            card.
+            Enter only the final four card digits.
           </p>
           <Form
             busy={busy}
