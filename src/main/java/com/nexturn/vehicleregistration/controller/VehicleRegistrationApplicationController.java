@@ -1,9 +1,10 @@
 package com.nexturn.vehicleregistration.controller;
 
+import java.util.List;
 import com.nexturn.vehicleregistration.dto.request.ApplicationReviewRequest;
 import com.nexturn.vehicleregistration.dto.request.NewVehicleRegistrationRequest;
 import com.nexturn.vehicleregistration.dto.response.ApplicationDetailsResponse;
-import com.nexturn.vehicleregistration.dto.response.ApplicationPageResponse;
+import com.nexturn.vehicleregistration.dto.response.ApplicationSummaryResponse;
 import com.nexturn.vehicleregistration.service.VehicleRegistrationApplicationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,16 +20,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin(origins = {"http://localhost:5173", "http://127.0.0.1:5173"})
-    @RequestMapping("/api/applications")
+@RequestMapping("/api/applications")
 public class VehicleRegistrationApplicationController {
     @Autowired
     private VehicleRegistrationApplicationService applicationService;
 
     @GetMapping
-    public ApplicationPageResponse list(@RequestParam(name="ownerId", required=false) Long ownerId,
-            @RequestParam(name="page", defaultValue="0") int page,
-            @RequestParam(name="size", defaultValue="20") int size) {
-        return applicationService.list(ownerId, page, size);
+    public List<ApplicationSummaryResponse> list(
+            @RequestParam(name = "ownerId", required = false) Long ownerId) {
+        return applicationService.list(ownerId);
     }
 
     @PostMapping

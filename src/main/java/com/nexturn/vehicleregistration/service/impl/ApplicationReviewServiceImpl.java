@@ -34,7 +34,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class ApplicationReviewServiceImpl implements ApplicationReviewService {
-
     @Autowired
     private RTOEmployeeRepository employeeRepository;
 
@@ -60,7 +59,6 @@ public class ApplicationReviewServiceImpl implements ApplicationReviewService {
     public ApplicationDetailsResponse review(
             String referenceNumber,
             ApplicationReviewRequest request, Long employeeId) {
-
         VehicleRegistrationApplication application = applicationRepository
                 .locked(referenceNumber)
                 .orElseThrow(
@@ -122,7 +120,6 @@ public class ApplicationReviewServiceImpl implements ApplicationReviewService {
 
     private void startVerification(
             VehicleRegistrationApplication application) {
-
         ensure(
                 application.getApplicationStatus() == ApplicationStatus.SUBMITTED,
                 "Application must be submitted before verification");
@@ -134,7 +131,6 @@ public class ApplicationReviewServiceImpl implements ApplicationReviewService {
             VehicleRegistrationApplication application,
             RTOEmployee employee,
             String remarks) {
-
         ensure(
                 application.getApplicationStatus()
                         == ApplicationStatus.UNDER_VERIFICATION,
@@ -154,7 +150,6 @@ public class ApplicationReviewServiceImpl implements ApplicationReviewService {
             VehicleRegistrationApplication application,
             RTOEmployee employee,
             String remarks) {
-
         ensure(
                 application.getApplicationStatus()
                         == ApplicationStatus.UNDER_VERIFICATION,
@@ -169,7 +164,6 @@ public class ApplicationReviewServiceImpl implements ApplicationReviewService {
     private void scheduleInspection(
             VehicleRegistrationApplication application,
             LocalDate appointment) {
-
         ensure(
                 application.getApplicationStatus()
                         == ApplicationStatus.INSPECTION_PENDING,
@@ -191,7 +185,6 @@ public class ApplicationReviewServiceImpl implements ApplicationReviewService {
             RTOEmployee employee,
             String action,
             String remarks) {
-
         ensure(
                 application.getApplicationStatus()
                         == ApplicationStatus.INSPECTION_PENDING
@@ -221,12 +214,10 @@ public class ApplicationReviewServiceImpl implements ApplicationReviewService {
             VehicleRegistrationApplication application,
             RTOEmployee employee,
             String remarks) {
-
         if (application.getApplicationStatus()
                         != ApplicationStatus.INSPECTION_PENDING
                 || application.getInspectionStatus()
                         != InspectionStatus.PASSED) {
-
             throw new InspectionNotPassedException();
         }
 
@@ -289,7 +280,6 @@ public class ApplicationReviewServiceImpl implements ApplicationReviewService {
             VehicleRegistrationApplication application,
             RTOEmployee employee,
             String remarks) {
-
         ensure(
                 remarks != null && !remarks.isBlank(),
                 "Rejection remarks are required");

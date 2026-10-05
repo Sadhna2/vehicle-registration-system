@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class RTOEmployeeServiceImpl implements RTOEmployeeService {
-
     @Autowired
     private OwnerRepository ownerRepository;
 
@@ -39,7 +38,6 @@ public class RTOEmployeeServiceImpl implements RTOEmployeeService {
     @Override
     @Transactional(readOnly = true)
     public List<RTOEmployeeResponse> employees() {
-
         return employeeRepository.findAll()
                 .stream()
                 .map(this::toEmployeeResponse)
@@ -49,9 +47,6 @@ public class RTOEmployeeServiceImpl implements RTOEmployeeService {
     @Override
     public RTOEmployeeResponse employee(
             RTOEmployeeRequest request) {
-
-
-
         String email = request.emailAddress()
                 .trim()
                 .toLowerCase(Locale.ROOT);
@@ -84,7 +79,6 @@ public class RTOEmployeeServiceImpl implements RTOEmployeeService {
     @Override
     @Transactional(readOnly = true)
     public List<OwnerResponse> owners() {
-
         return ownerRepository.findAll()
                 .stream()
                 .map(this::toOwnerResponse)
@@ -96,7 +90,6 @@ public class RTOEmployeeServiceImpl implements RTOEmployeeService {
             String accountType,
             Long accountId,
             AccountRequest request) {
-
         if ("owners".equals(accountType)) {
             updateOwner(accountId, request);
 
@@ -114,7 +107,6 @@ public class RTOEmployeeServiceImpl implements RTOEmployeeService {
     }
 
     private void updateOwner(Long ownerId, AccountRequest request) {
-
         ensure(
                 request.role() == null,
                 "Owners have no database role field");
@@ -129,7 +121,6 @@ public class RTOEmployeeServiceImpl implements RTOEmployeeService {
     private void updateEmployee(
             Long employeeId,
             AccountRequest request) {
-
         RTOEmployee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
 
@@ -141,7 +132,6 @@ public class RTOEmployeeServiceImpl implements RTOEmployeeService {
     }
 
     private OwnerResponse toOwnerResponse(Owner owner) {
-
                 if (owner == null) {
                         return null;
                 }
@@ -166,7 +156,6 @@ public class RTOEmployeeServiceImpl implements RTOEmployeeService {
         }
 
     private RTOEmployeeResponse toEmployeeResponse(RTOEmployee employee) {
-
                 if (employee == null) {
                         return null;
                 }

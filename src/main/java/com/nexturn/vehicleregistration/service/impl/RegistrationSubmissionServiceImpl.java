@@ -33,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class RegistrationSubmissionServiceImpl
         implements RegistrationSubmissionService {
-
     @Autowired
     private OwnerRepository ownerRepository;
 
@@ -55,7 +54,6 @@ public class RegistrationSubmissionServiceImpl
     @Override
     public ApplicationDetailsResponse submit(
             NewVehicleRegistrationRequest request, Long ownerId) {
-
         Owner owner = ownerRepository
                 .findById(ownerId)
                 .orElseThrow(() -> new OwnerNotFoundException(ownerId));
@@ -77,7 +75,6 @@ public class RegistrationSubmissionServiceImpl
     public ApplicationDetailsResponse correct(
             String referenceNumber,
             NewVehicleRegistrationRequest request) {
-
         VehicleRegistrationApplication application = applicationRepository
                 .locked(referenceNumber)
                 .orElseThrow(
@@ -107,7 +104,6 @@ public class RegistrationSubmissionServiceImpl
     private VehicleRegistrationApplication createApplication(
             Vehicle vehicle,
             Owner owner) {
-
         boolean openApplicationExists = applicationRepository
                 .existsByVehicleTemporaryregisterNoAndApplicationStatusNotIn(
                         vehicle.getTemporaryregisterNo(),
@@ -157,7 +153,6 @@ public class RegistrationSubmissionServiceImpl
     private void updateVehicle(
             Vehicle vehicle,
             NewVehicleRegistrationRequest request) {
-
         ensure(
                 request.manufactureYear() <= Year.now().getValue(),
                 "Manufacture year cannot be in the future");

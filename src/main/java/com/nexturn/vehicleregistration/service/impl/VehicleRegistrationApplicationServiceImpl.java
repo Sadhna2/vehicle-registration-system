@@ -4,7 +4,7 @@ import com.nexturn.vehicleregistration.dto.request.ApplicationReviewRequest;
 import com.nexturn.vehicleregistration.dto.request.NewVehicleRegistrationRequest;
 import com.nexturn.vehicleregistration.dto.request.PaymentRequest;
 import com.nexturn.vehicleregistration.dto.response.ApplicationDetailsResponse;
-import com.nexturn.vehicleregistration.dto.response.ApplicationPageResponse;
+import com.nexturn.vehicleregistration.dto.response.ApplicationSummaryResponse;
 import com.nexturn.vehicleregistration.dto.response.RegistrationCertificateResponse;
 import com.nexturn.vehicleregistration.dto.response.VehicleResponse;
 import com.nexturn.vehicleregistration.service.ApplicationQueryService;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class VehicleRegistrationApplicationServiceImpl
         implements VehicleRegistrationApplicationService {
-
     @Autowired
     private RegistrationSubmissionService registrationSubmissionService;
 
@@ -35,7 +34,6 @@ public class VehicleRegistrationApplicationServiceImpl
     @Override
     public ApplicationDetailsResponse submit(
             NewVehicleRegistrationRequest request, Long ownerId) {
-
         return registrationSubmissionService.submit(request, ownerId);
     }
 
@@ -43,7 +41,6 @@ public class VehicleRegistrationApplicationServiceImpl
     public ApplicationDetailsResponse correct(
             String referenceNumber,
             NewVehicleRegistrationRequest request) {
-
         return registrationSubmissionService.correct(
                 referenceNumber, request);
     }
@@ -52,7 +49,6 @@ public class VehicleRegistrationApplicationServiceImpl
     public ApplicationDetailsResponse pay(
             String referenceNumber,
             PaymentRequest request) {
-
         return paymentService.pay(referenceNumber, request);
     }
 
@@ -60,21 +56,18 @@ public class VehicleRegistrationApplicationServiceImpl
     public ApplicationDetailsResponse review(
             String referenceNumber,
             ApplicationReviewRequest request, Long employeeId) {
-
         return applicationReviewService.review(
                 referenceNumber, request, employeeId);
     }
 
     @Override
-    public ApplicationPageResponse list(Long ownerId, int page, int size) {
-
-        return applicationQueryService.list(ownerId, page, size);
+    public List<ApplicationSummaryResponse> list(Long ownerId) {
+        return applicationQueryService.list(ownerId);
     }
 
     @Override
     public ApplicationDetailsResponse get(
             String referenceNumber) {
-
         return applicationQueryService.get(referenceNumber);
     }
 
@@ -86,7 +79,6 @@ public class VehicleRegistrationApplicationServiceImpl
     @Override
     public RegistrationCertificateResponse certificate(
             String referenceNumber) {
-
         return applicationQueryService.certificate(referenceNumber);
     }
 }

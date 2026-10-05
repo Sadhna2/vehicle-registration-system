@@ -74,4 +74,3 @@ public class RenewalOfVehicle {
     this.newValidTill = value;
   }
 }
-

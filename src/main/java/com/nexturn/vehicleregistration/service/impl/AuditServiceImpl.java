@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class AuditServiceImpl implements AuditService {
-
     @Autowired
     private AuditLogRepository auditLogRepository;
 
@@ -20,7 +19,6 @@ public class AuditServiceImpl implements AuditService {
             VehicleRegistrationApplication application,
             String action,
             String remarks) {
-
         AuditLogs auditLog = new AuditLogs();
 
         auditLog.setActor("PUBLIC");

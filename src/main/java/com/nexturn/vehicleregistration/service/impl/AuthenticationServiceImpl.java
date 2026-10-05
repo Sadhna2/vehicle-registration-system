@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 public class AuthenticationServiceImpl implements AuthenticationService {
-
     @Autowired
     private OwnerRepository ownerRepository;
 
@@ -30,7 +29,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     @Transactional
     public LoginResponse signup(OwnerRequest request) {
-
         String email = request.emailAddress()
                 .trim()
                 .toLowerCase(Locale.ROOT);
@@ -65,7 +63,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public LoginResponse login(LoginRequest request) {
-
         String email = request.email()
                 .trim()
                 .toLowerCase(Locale.ROOT);
@@ -78,14 +75,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     private LoginResponse loginEmployee(String email, String password) {
-
         RTOEmployee employee = employeeRepository
                 .findByEmailAddress(email)
                 .orElseThrow(this::invalidLogin);
 
         if (employee.getStatus() != AccountStatus.ACTIVE
                 || !PasswordUtil.matches(password, employee.getPassword())) {
-
             throw invalidLogin();
         }
 
@@ -96,14 +91,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     private LoginResponse loginOwner(String email, String password) {
-
         Owner owner = ownerRepository
                 .findByEmailAddress(email)
                 .orElseThrow(this::invalidLogin);
 
         if (owner.getStatus() != AccountStatus.ACTIVE
                 || !PasswordUtil.matches(password, owner.getPassword())) {
-
             throw invalidLogin();
         }
 

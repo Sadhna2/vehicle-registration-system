@@ -84,4 +84,3 @@ public class RegistrationCertificate {
     this.registeredOwner = value;
   }
 }
-

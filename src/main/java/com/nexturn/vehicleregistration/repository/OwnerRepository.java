@@ -8,4 +8,3 @@ public interface OwnerRepository extends JpaRepository<Owner, Long> {
     Optional<Owner> findByEmailAddress(String email);
 
 }
-

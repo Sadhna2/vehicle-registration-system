@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AdministrationServiceImpl implements AdministrationService {
-
     @Autowired
     private RegistrationFeeRuleService registrationFeeRuleService;
 
@@ -36,7 +35,6 @@ public class AdministrationServiceImpl implements AdministrationService {
     @Override
     public RegistrationFeeRuleResponse fee(
             RegistrationFeeRuleRequest request) {
-
         return registrationFeeRuleService.fee(request);
     }
 
@@ -48,7 +46,6 @@ public class AdministrationServiceImpl implements AdministrationService {
     @Override
     public RTOEmployeeResponse employee(
             RTOEmployeeRequest request) {
-
         return employeeService.employee(request);
     }
 
@@ -62,7 +59,6 @@ public class AdministrationServiceImpl implements AdministrationService {
             String accountType,
             Long accountId,
             AccountRequest request) {
-
         employeeService.account(accountType, accountId, request);
     }
 

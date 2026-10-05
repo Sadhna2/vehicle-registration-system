@@ -6,7 +6,6 @@ import com.nexturn.vehicleregistration.exception.RecordNotFoundException;
 import java.util.Optional;
 
 public final class WorkflowSupport {
-
     private WorkflowSupport() {
     }
 

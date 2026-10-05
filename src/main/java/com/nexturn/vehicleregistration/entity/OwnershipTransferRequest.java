@@ -136,4 +136,3 @@ public class OwnershipTransferRequest {
     this.remark = value;
   }
 }
-

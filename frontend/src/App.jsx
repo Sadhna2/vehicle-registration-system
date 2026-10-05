@@ -13,11 +13,10 @@ import useRegistrationData from "./hooks/useRegistrationData";
 export default function App() {
   const [user, setUser] = useSessionUser();
   const [tab, setTab] = useState("applications");
-  const [page, setPage] = useState(0),
-    [detail, setDetail] = useState(null),
+  const [detail, setDetail] = useState(null),
     [refresh, setRefresh] = useState(0);
   const { run, busy, error, setError } = useAction();
-  const data = useRegistrationData(user, page, refresh);
+  const data = useRegistrationData(user, refresh);
   const owner = user?.role === "OWNER";
   const navigation = [
     ["applications", owner ? "My applications" : "Review queue"],
@@ -40,7 +39,6 @@ export default function App() {
   const signOut = () => {
     setUser(null);
     setDetail(null);
-    setPage(0);
     setTab("applications");
     setError("");
   };
@@ -92,7 +90,6 @@ export default function App() {
           busy={busy}
           onLogin={(account) => {
             setUser(account);
-            setPage(0);
             setTab("applications");
           }}
         />
@@ -111,9 +108,6 @@ export default function App() {
                 {name}
               </button>
             ))}
-            <p className="sidebar-note">
-              Applications refresh every 15 seconds.
-            </p>
           </aside>
           <main className="main-content">
             <h1 className="page-title">
@@ -133,8 +127,6 @@ export default function App() {
               ) : (
                 <ApplicationsPage
                   data={data}
-                  page={page}
-                  setPage={setPage}
                   busy={busy}
                   onOpen={open}
                   onRefresh={refreshData}

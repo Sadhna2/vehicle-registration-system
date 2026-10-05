@@ -16,4 +16,3 @@ public class RegistrationCertificateNotFoundException extends RuntimeException i
     return "CERTIFICATE_NOT_FOUND";
   }
 }
-

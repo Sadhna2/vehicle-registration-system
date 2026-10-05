@@ -134,4 +134,3 @@ public class RTOEmployee {
     this.dateOfJoining = value;
   }
 }
-

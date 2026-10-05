@@ -16,7 +16,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 public class ReportServiceImpl implements ReportService {
-
     @Autowired
     private OwnerRepository ownerRepository;
 
@@ -42,7 +40,6 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public Map<String, Object> report() {
-
         Map<String, Long> statusCounts = new LinkedHashMap<>();
 
         for (ApplicationStatus status : ApplicationStatus.values()) {
@@ -72,14 +69,8 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<AuditLogResponse> audits() {
-
         return auditLogRepository
-                .findAll(
-                        PageRequest.of(
-                                0,
-                                100,
-                                Sort.by("createdAt").descending()))
-                .getContent()
+                .findAll(Sort.by("createdAt").descending())
                 .stream()
                 .map(this::toAuditResponse)
                 .toList();

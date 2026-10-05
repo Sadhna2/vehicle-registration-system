@@ -10,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 import com.nexturn.vehicleregistration.entity.Vehicle;
 import jakarta.persistence.LockModeType;
 public interface VechileRepository extends JpaRepository<Vehicle, Long> {
-
     List<Vehicle> findByCurrentOwnerOwnerId(Long id);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
@@ -19,5 +18,3 @@ public interface VechileRepository extends JpaRepository<Vehicle, Long> {
 
     long countByRegistrationValidTillLessThanEqual(LocalDate deadline);
 }
-
-

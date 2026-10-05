@@ -16,4 +16,3 @@ public class InvalidOperationException extends RuntimeException implements ApiEr
     return "INVALID_OPERATION";
   }
 }
-

@@ -279,4 +279,3 @@ public class VehicleRegistrationApplication {
     this.version = value;
   }
 }
-

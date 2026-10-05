@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class PaymentServiceImpl implements PaymentService {
-
     @Autowired
     private ApplicationWorkflowRepository applicationRepository;
 
@@ -40,7 +39,6 @@ public class PaymentServiceImpl implements PaymentService {
     public ApplicationDetailsResponse pay(
             String referenceNumber,
             PaymentRequest request) {
-
         VehicleRegistrationApplication application = applicationRepository
                 .locked(referenceNumber)
                 .orElseThrow(
@@ -59,7 +57,6 @@ public class PaymentServiceImpl implements PaymentService {
         if (paymentRepository
                 .findByApplicationApplicationRefNo(referenceNumber)
                 .isPresent()) {
-
             return applicationQueryService.detail(application);
         }
 

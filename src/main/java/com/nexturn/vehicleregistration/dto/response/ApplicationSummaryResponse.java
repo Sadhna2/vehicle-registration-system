@@ -6,7 +6,7 @@ import java.time.Instant;
 import com.nexturn.vehicleregistration.enums.ApplicationStatus;
 import com.nexturn.vehicleregistration.enums.ApplicationType;
 
-public record ApplicationSummaryResponse(String reference, 
+public record ApplicationSummaryResponse(String reference,
 		ApplicationType type,
 		ApplicationStatus status,
 		BigDecimal amount,

@@ -6,8 +6,7 @@ import java.util.Optional;
 
 import jakarta.persistence.LockModeType;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -18,8 +17,7 @@ import com.nexturn.vehicleregistration.enums.ApplicationStatus;
 
 public interface VehicleRegistrationApplicationRepository
 		extends JpaRepository<VehicleRegistrationApplication, String> {
-
-	Page<VehicleRegistrationApplication> findByApplicantOwnerId(Long id, Pageable pageable);
+	List<VehicleRegistrationApplication> findByApplicantOwnerId(Long id, Sort sort);
 
 	@Query("""
 	        select a from VehicleRegistrationApplication a
@@ -30,9 +28,9 @@ public interface VehicleRegistrationApplicationRepository
 	            where t.newOwner.ownerId = :id
 	        )
 	        """)
-	Page<VehicleRegistrationApplication> visibleTo(
+	List<VehicleRegistrationApplication> visibleTo(
 	        @Param("id") Long id,
-	        Pageable pageable);
+	        Sort sort);
 	boolean existsByVehicleTemporaryregisterNoAndApplicationStatusNotIn(Long id,
 			Collection<ApplicationStatus> statuses);
 

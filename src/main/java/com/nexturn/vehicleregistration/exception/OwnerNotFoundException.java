@@ -16,4 +16,3 @@ public class OwnerNotFoundException extends RuntimeException implements ApiError
     return "OWNER_NOT_FOUND";
   }
 }
-

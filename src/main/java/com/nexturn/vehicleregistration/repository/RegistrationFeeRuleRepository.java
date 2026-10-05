@@ -10,7 +10,6 @@ import com.nexturn.vehicleregistration.enums.ApplicationType;
 import com.nexturn.vehicleregistration.enums.VehicleCategory;
 
 public interface RegistrationFeeRuleRepository extends JpaRepository<RegistrationFeeRule, Long> {
-
 	Optional<RegistrationFeeRule> findFirstByVehicleCategoryAndApplicationTypeAndEffectiveFromLessThanEqualOrderByEffectiveFromDescFeeRuleIdDesc(
 			VehicleCategory category, ApplicationType type, LocalDate today);
 }

@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 public interface AdministrationService {
-
     List<RegistrationFeeRuleResponse> fees();
 
     RegistrationFeeRuleResponse fee(

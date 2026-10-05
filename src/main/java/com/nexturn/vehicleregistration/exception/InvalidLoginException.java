@@ -16,4 +16,3 @@ public class InvalidLoginException extends RuntimeException implements ApiError 
     return "INVALID_LOGIN";
   }
 }
-

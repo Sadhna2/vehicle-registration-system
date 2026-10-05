@@ -9,4 +9,3 @@ public interface OwnershipTransferRequestRepository
     Optional<OwnershipTransferRequest> findByApplicationApplicationRefNo(String ref);
 
 }
-

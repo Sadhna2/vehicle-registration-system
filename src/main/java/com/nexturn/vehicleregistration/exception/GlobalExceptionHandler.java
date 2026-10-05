@@ -35,7 +35,6 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler({
-
     ApplicationIdNotFoundException.class,
 
     DuplicateRecordException.class,
@@ -153,5 +152,3 @@ public class GlobalExceptionHandler {
         "An unexpected error occurred. Try again later.");
   }
 }
-
-

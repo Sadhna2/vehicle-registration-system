@@ -76,4 +76,3 @@ public class RegistrationFeeRule {
     this.effectiveFrom = value;
   }
 }
-

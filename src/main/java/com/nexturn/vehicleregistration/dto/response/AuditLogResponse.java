@@ -9,4 +9,3 @@ public record AuditLogResponse(
     String applicationRefNo,
     String remarks,
     Instant createdAt) {}
-

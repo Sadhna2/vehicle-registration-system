@@ -16,4 +16,3 @@ public class ReferenceNumberNotFoundException extends RuntimeException implement
     return "REFERENCE_NUMBER_NOT_FOUND";
   }
 }
-

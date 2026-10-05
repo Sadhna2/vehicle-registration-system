@@ -16,4 +16,3 @@ public class DuplicateRecordException extends RuntimeException implements ApiErr
     return "DUPLICATE_RECORD";
   }
 }
-

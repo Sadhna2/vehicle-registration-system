@@ -16,4 +16,3 @@ public class PasswordHashException extends RuntimeException implements ApiError 
     return "PASSWORD_HASH_FAILED";
   }
 }
-

@@ -16,4 +16,3 @@ public class PaymentRequiredException extends RuntimeException implements ApiErr
     return "PAYMENT_REQUIRED";
   }
 }
-

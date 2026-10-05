@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class RegistrationFeeRuleServiceImpl
         implements RegistrationFeeRuleService {
-
     @Autowired
     private RegistrationFeeRuleRepository feeRuleRepository;
 
@@ -28,7 +27,6 @@ public class RegistrationFeeRuleServiceImpl
     @Override
     @Transactional(readOnly = true)
     public List<RegistrationFeeRuleResponse> fees() {
-
         return feeRuleRepository
                 .findAll(Sort.by("effectiveFrom").descending())
                 .stream()
@@ -40,7 +38,6 @@ public class RegistrationFeeRuleServiceImpl
     @Override
     public RegistrationFeeRuleResponse fee(
             RegistrationFeeRuleRequest request) {
-
         ensure(
                 request.applicationType() == ApplicationType.NEW,
                 "Only new vehicle registration fee rules are supported");

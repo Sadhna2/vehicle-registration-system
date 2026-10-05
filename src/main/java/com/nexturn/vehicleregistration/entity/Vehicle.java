@@ -1,6 +1,5 @@
 package com.nexturn.vehicleregistration.entity;
 
-
 import java.time.LocalDate;
 
 import com.nexturn.vehicleregistration.enums.FuelType;

@@ -16,4 +16,3 @@ public class RecordNotFoundException extends RuntimeException implements ApiErro
     return "RECORD_NOT_FOUND";
   }
 }
-

@@ -8,7 +8,6 @@ import com.nexturn.vehicleregistration.dto.response.RTOEmployeeResponse;
 import java.util.List;
 
 public interface RTOEmployeeService {
-
     List<RTOEmployeeResponse> employees();
 
     RTOEmployeeResponse employee(

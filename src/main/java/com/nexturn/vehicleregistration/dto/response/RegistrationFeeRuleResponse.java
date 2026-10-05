@@ -11,4 +11,3 @@ public record RegistrationFeeRuleResponse(
     ApplicationType applicationType,
     BigDecimal feeAmount,
     LocalDate effectiveFrom) {}
-

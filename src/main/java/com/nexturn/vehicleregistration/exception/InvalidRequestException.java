@@ -16,4 +16,3 @@ public class InvalidRequestException extends RuntimeException implements ApiErro
     return "INVALID_REQUEST";
   }
 }
-

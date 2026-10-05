@@ -14,6 +14,7 @@ import java.time.Year;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -134,9 +135,42 @@ class VehicleRegistrationApiTest {
     @Test void submissionAndQueriesNeedNoToken() throws Exception {
         String reference=submit();assertTrue(reference.startsWith("VRS-"));
         assertEquals("SUBMITTED",api("GET","/api/applications/"+reference,null,200).path("applicationStatus").asString());
-        JsonNode page=api("GET","/api/applications?ownerId="+ownerId,null,200);assertEquals(1,page.path("totalElements").asLong());
+        JsonNode applications=api("GET","/api/applications?ownerId="+ownerId,null,200);
+        assertTrue(applications.isArray());assertEquals(1,applications.size());
         assertEquals(1,api("GET","/api/vehicles?ownerId="+ownerId,null,200).size());
         api("GET","/api/applications",null,200);api("GET","/api/vehicles",null,200);
+    }
+
+    @Test
+    void applicationListReturnsAllRecordsWithoutPagination() throws Exception {
+        Set<String> references = new HashSet<>();
+        for (int i = 0; i < 25; i++) {
+            references.add(submit());
+        }
+        long otherOwnerId = api("POST", "/api/auth/signup",
+                owner("other-" + UUID.randomUUID() + "@example.com"), 200)
+                .path("id").asLong();
+        String otherReference = api("POST", "/api/applications?ownerId=" + otherOwnerId,
+                vehicle(), 200).path("applicationRefNo").asString();
+        JsonNode applications = api("GET", "/api/applications?ownerId=" + ownerId, null, 200);
+        assertTrue(applications.isArray());
+        assertEquals(25, applications.size());
+        for (JsonNode application : applications) {
+            assertTrue(references.remove(application.path("reference").asString()));
+        }
+        assertTrue(references.isEmpty());
+        JsonNode allApplications = api("GET", "/api/applications", null, 200);
+        assertTrue(allApplications.isArray());
+        boolean foundOther = false;
+        for (JsonNode application : allApplications) {
+            foundOther |= otherReference.equals(application.path("reference").asString());
+        }
+        assertTrue(foundOther);
+        JsonNode parameters = api("GET", "/v3/api-docs", null, 200)
+                .path("paths").path("/api/applications").path("get").path("parameters");
+        for (JsonNode parameter : parameters) {
+            assertFalse(Set.of("page", "size").contains(parameter.path("name").asString()));
+        }
     }
 
     @Test void missingIdsAndMissingRecordsHaveProperErrors() throws Exception {

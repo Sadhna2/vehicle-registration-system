@@ -120,7 +120,7 @@ public class Owner {
   }
 
   public LocalDate getDateOfBirth() {
-    return dateOfBirth; 
+    return dateOfBirth;
   }
 
   public void setDateOfBirth(LocalDate value) {
@@ -199,4 +199,3 @@ public class Owner {
     this.dateOfUpdate = value;
   }
 }
-

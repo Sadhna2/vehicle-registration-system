@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 
-const empty = { content: [], totalElements: 0, totalPages: 0, vehicles: [] };
+const empty = { applications: [], vehicles: [] };
 
-export default function useRegistrationData(user, page, refresh) {
+export default function useRegistrationData(user, refresh) {
   const [data, setData] = useState(empty);
   const [error, setError] = useState("");
   const [loaded, setLoaded] = useState(false);
@@ -18,13 +18,11 @@ export default function useRegistrationData(user, page, refresh) {
     async function load() {
       try {
         const [applications, vehicles] = await Promise.all([
-          api(
-            `/applications?page=${page}${ownerId ? `&ownerId=${ownerId}` : ""}`,
-          ),
+          api(`/applications${ownerId ? `?ownerId=${ownerId}` : ""}`),
           ownerId ? api(`/vehicles?ownerId=${ownerId}`) : Promise.resolve([]),
         ]);
         if (active) {
-          setData({ ...applications, vehicles });
+          setData({ applications, vehicles });
           setLoaded(true);
           setError("");
         }
@@ -33,13 +31,9 @@ export default function useRegistrationData(user, page, refresh) {
       }
     }
     load();
-    const timer = setInterval(() => {
-      if (!document.hidden) load();
-    }, 15000);
     return () => {
       active = false;
-      clearInterval(timer);
     };
-  }, [userId, ownerId, page, refresh]);
+  }, [userId, ownerId, refresh]);
   return { ...data, loaded, error, clearError: () => setError("") };
 }

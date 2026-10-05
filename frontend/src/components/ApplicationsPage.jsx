@@ -2,17 +2,10 @@ import { useState } from "react";
 import { money } from "../api";
 import Status from "./Status";
 
-export default function ApplicationsPage({
-  data,
-  page,
-  setPage,
-  busy,
-  onOpen,
-  onRefresh,
-}) {
+export default function ApplicationsPage({ data, busy, onOpen, onRefresh }) {
   const [query, setQuery] = useState("");
   const [reference, setReference] = useState("");
-  const rows = data.content.filter((row) =>
+  const rows = data.applications.filter((row) =>
     `${row.reference} ${row.owner} ${row.vehicle}`
       .toLowerCase()
       .includes(query.toLowerCase()),
@@ -47,7 +40,7 @@ export default function ApplicationsPage({
         </div>
       </form>
       <div className="d-flex justify-content-between mb-3">
-        <h2>Application register ({data.totalElements})</h2>
+        <h2>Application register ({data.applications.length})</h2>
         <button
           className="btn btn-outline-primary"
           disabled={busy}
@@ -57,7 +50,7 @@ export default function ApplicationsPage({
         </button>
       </div>
       <label className="form-label" htmlFor="application-filter">
-        Filter current page
+        Filter applications
       </label>
       <input
         id="application-filter"
@@ -112,25 +105,6 @@ export default function ApplicationsPage({
               : "Loading applications…"}
         </p>
       )}
-      <div className="d-flex justify-content-between align-items-center">
-        <button
-          className="btn btn-outline-secondary"
-          disabled={busy || page === 0}
-          onClick={() => setPage(page - 1)}
-        >
-          Previous
-        </button>
-        <span>
-          Page {page + 1} of {Math.max(1, data.totalPages)}
-        </span>
-        <button
-          className="btn btn-outline-secondary"
-          disabled={busy || page + 1 >= data.totalPages}
-          onClick={() => setPage(page + 1)}
-        >
-          Next
-        </button>
-      </div>
     </section>
   );
 }

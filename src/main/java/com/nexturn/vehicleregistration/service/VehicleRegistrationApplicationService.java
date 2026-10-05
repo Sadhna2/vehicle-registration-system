@@ -4,14 +4,13 @@ import com.nexturn.vehicleregistration.dto.request.ApplicationReviewRequest;
 import com.nexturn.vehicleregistration.dto.request.NewVehicleRegistrationRequest;
 import com.nexturn.vehicleregistration.dto.request.PaymentRequest;
 import com.nexturn.vehicleregistration.dto.response.ApplicationDetailsResponse;
-import com.nexturn.vehicleregistration.dto.response.ApplicationPageResponse;
+import com.nexturn.vehicleregistration.dto.response.ApplicationSummaryResponse;
 import com.nexturn.vehicleregistration.dto.response.RegistrationCertificateResponse;
 import com.nexturn.vehicleregistration.dto.response.VehicleResponse;
 
 import java.util.List;
 
 public interface VehicleRegistrationApplicationService {
-
     ApplicationDetailsResponse submit(
             NewVehicleRegistrationRequest request, Long ownerId);
 
@@ -27,7 +26,7 @@ public interface VehicleRegistrationApplicationService {
             String referenceNumber,
             ApplicationReviewRequest request, Long employeeId);
 
-    ApplicationPageResponse list(Long ownerId, int page, int size);
+    List<ApplicationSummaryResponse> list(Long ownerId);
 
     ApplicationDetailsResponse get(
             String referenceNumber);

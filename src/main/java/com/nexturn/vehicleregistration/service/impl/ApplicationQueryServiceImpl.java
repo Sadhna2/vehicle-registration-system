@@ -1,7 +1,6 @@
 package com.nexturn.vehicleregistration.service.impl;
 
 import com.nexturn.vehicleregistration.dto.response.ApplicationDetailsResponse;
-import com.nexturn.vehicleregistration.dto.response.ApplicationPageResponse;
 import com.nexturn.vehicleregistration.dto.response.ApplicationSummaryResponse;
 import com.nexturn.vehicleregistration.dto.response.OwnerPaymentDetailResponse;
 import com.nexturn.vehicleregistration.dto.response.OwnerResponse;
@@ -21,9 +20,6 @@ import com.nexturn.vehicleregistration.repository.VechileRepository;
 import com.nexturn.vehicleregistration.service.ApplicationQueryService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 public class ApplicationQueryServiceImpl implements ApplicationQueryService {
-
     @Autowired
     private VechileRepository vehicleRepository;
 
@@ -47,7 +42,6 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
     @Override
     public ApplicationDetailsResponse detail(
             VehicleRegistrationApplication application) {
-
         String referenceNumber = application.getApplicationRefNo();
 
         return toApplicationDetailsResponse(
@@ -61,32 +55,19 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
     }
 
     @Override
-    public ApplicationPageResponse list(Long ownerId, int page, int size) {
-
-        Pageable pageable = PageRequest.of(
-                Math.max(0, page),
-                Math.max(1, Math.min(100, size)),
-                Sort.by("submittedDate").descending());
-
-        Page<VehicleRegistrationApplication> applications =
-                ownerId != null
-                        ? applicationRepository.findByApplicantOwnerId(
-                                ownerId, pageable)
-                        : applicationRepository.findAll(pageable);
-
-        return new ApplicationPageResponse(
-                applications.stream()
-                        .map(this::toApplicationSummaryResponse)
-                        .toList(),
-                applications.getTotalElements(),
-                applications.getTotalPages(),
-                applications.getNumber());
+    public List<ApplicationSummaryResponse> list(Long ownerId) {
+        Sort sort = Sort.by("submittedDate").descending();
+        List<VehicleRegistrationApplication> applications = ownerId == null
+                ? applicationRepository.findAll(sort)
+                : applicationRepository.findByApplicantOwnerId(ownerId, sort);
+        return applications.stream()
+                .map(this::toApplicationSummaryResponse)
+                .toList();
     }
 
     @Override
     public ApplicationDetailsResponse get(
             String referenceNumber) {
-
         VehicleRegistrationApplication application =
                 applicationRepository.findById(referenceNumber)
                         .orElseThrow(() -> new ReferenceNumberNotFoundException(referenceNumber));
@@ -96,7 +77,6 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 
     @Override
     public List<VehicleResponse> vehicles(Long ownerId) {
-
         return (ownerId == null ? vehicleRepository.findAll()
                 : vehicleRepository.findByCurrentOwnerOwnerId(ownerId))
                 .stream()
@@ -107,7 +87,6 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
     @Override
     public RegistrationCertificateResponse certificate(
             String referenceNumber) {
-
         VehicleRegistrationApplication application =
                 applicationRepository.findById(referenceNumber)
                         .orElseThrow(() -> new ReferenceNumberNotFoundException(referenceNumber));
@@ -124,8 +103,6 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
                 .orElseThrow(
                         () -> new RegistrationCertificateNotFoundException(
                                 registrationNumber));
-
-
 
         return toCertificateResponse(certificate);
     }
@@ -213,7 +190,6 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
     }
 
     private OwnerResponse toOwnerResponse(Owner owner) {
-
                 if (owner == null) {
                         return null;
                 }
@@ -238,7 +214,6 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
         }
 
     private VehicleResponse toVehicleResponse(Vehicle vehicle) {
-
                 if (vehicle == null) {
                         return null;
                 }
@@ -262,7 +237,6 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 
     private OwnerPaymentDetailResponse toPaymentResponse(
                         OwnerPaymentDetail payment) {
-
                 if (payment == null) {
                         return null;
                 }
@@ -288,7 +262,6 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 
     private RegistrationCertificateResponse toCertificateResponse(
                         RegistrationCertificate certificate) {
-
                 if (certificate == null) {
                         return null;
                 }
