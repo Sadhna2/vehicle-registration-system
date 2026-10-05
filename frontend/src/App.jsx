@@ -1,8 +1,15 @@
 import { useState } from "react";
-import { api, label } from "./api";
+import {
+  NavLink,
+  Navigate,
+  Route,
+  Routes,
+  useNavigate,
+} from "react-router-dom";
+import { label } from "./api";
 import Auth from "./components/Auth";
 import Admin from "./components/Admin";
-import Detail from "./components/Detail";
+import ApplicationDetailsPage from "./components/ApplicationDetailsPage";
 import ApplicationsPage from "./components/ApplicationsPage";
 import NewRegistrationPage from "./components/NewRegistrationPage";
 import VehiclesPage from "./components/VehiclesPage";
@@ -10,42 +17,46 @@ import useAction from "./hooks/useAction";
 import useSessionUser from "./hooks/useSessionUser";
 import useRegistrationData from "./hooks/useRegistrationData";
 
+function Page({ title, children }) {
+  return (
+    <>
+      <h1 className="page-title">{title}</h1>
+      {children}
+    </>
+  );
+}
+
 export default function App() {
   const [user, setUser] = useSessionUser();
-  const [tab, setTab] = useState("applications");
-  const [detail, setDetail] = useState(null),
-    [refresh, setRefresh] = useState(0);
+  const [refresh, setRefresh] = useState(0);
+  const navigate = useNavigate();
   const { run, busy, error, setError } = useAction();
   const data = useRegistrationData(user, refresh);
   const owner = user?.role === "OWNER";
+  const administrator = ["RTO_ADMIN", "SYSTEM_ADMIN"].includes(user?.role);
+  const applicationsTitle = owner ? "My applications" : "Review queue";
   const navigation = [
-    ["applications", owner ? "My applications" : "Review queue"],
+    ["/applications", applicationsTitle],
     ...(owner
       ? [
-          ["new", "New registration"],
-          ["vehicles", "My vehicles"],
+          ["/new-registration", "New registration"],
+          ["/vehicles", "My vehicles"],
         ]
       : []),
-    ...(["RTO_ADMIN", "SYSTEM_ADMIN"].includes(user?.role)
-      ? [["admin", "Administration"]]
-      : []),
+    ...(administrator ? [["/administration", "Administration"]] : []),
   ];
   const refreshData = () => setRefresh((value) => value + 1);
+  const open = (reference) =>
+    navigate(`/applications/${encodeURIComponent(reference)}`);
   const changed = (result) => {
-    setDetail(result);
-    setTab("applications");
     refreshData();
+    open(result.reference);
   };
   const signOut = () => {
     setUser(null);
-    setDetail(null);
-    setTab("applications");
     setError("");
+    navigate("/login", { replace: true });
   };
-  const open = (reference) =>
-    run(async () =>
-      setDetail(await api(`/applications/${encodeURIComponent(reference)}`)),
-    );
   return (
     <>
       <header className="topbar">
@@ -56,7 +67,7 @@ export default function App() {
           {user && (
             <div className="d-flex align-items-center gap-3">
               <span>
-                {user.name} · {label(user.role)}
+                {user.name} | {label(user.role)}
               </span>
               <button
                 className="btn btn-outline-secondary"
@@ -85,65 +96,116 @@ export default function App() {
         </div>
       )}
       {!user ? (
-        <Auth
-          run={run}
-          busy={busy}
-          onLogin={(account) => {
-            setUser(account);
-            setTab("applications");
-          }}
-        />
+        <Routes>
+          <Route
+            path="/login"
+            element={
+              <Auth
+                run={run}
+                busy={busy}
+                onLogin={(account) => {
+                  setUser(account);
+                  navigate("/applications", { replace: true });
+                }}
+              />
+            }
+          />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
       ) : (
         <div className="workspace">
           <aside className="sidebar">
-            {navigation.map(([id, name]) => (
-              <button
-                key={id}
-                className={`nav-item ${tab === id ? "active" : ""}`}
-                onClick={() => {
-                  setTab(id);
-                  setDetail(null);
-                }}
+            {navigation.map(([path, name]) => (
+              <NavLink
+                key={path}
+                to={path}
+                className={({ isActive }) =>
+                  `nav-item ${isActive ? "active" : ""}`
+                }
               >
                 {name}
-              </button>
+              </NavLink>
             ))}
           </aside>
           <main className="main-content">
-            <h1 className="page-title">
-              {navigation.find(([id]) => id === tab)?.[1]}
-            </h1>
-            {tab === "applications" &&
-              (detail ? (
-                <Detail
-                  key={detail.reference}
-                  data={detail}
-                  user={user}
-                  run={run}
-                  busy={busy}
-                  onChange={changed}
-                  onClose={() => setDetail(null)}
-                />
-              ) : (
-                <ApplicationsPage
-                  data={data}
-                  busy={busy}
-                  onOpen={open}
-                  onRefresh={refreshData}
-                />
-              ))}
-            {tab === "new" && (
-              <NewRegistrationPage
-                ownerId={user.id}
-                run={run}
-                busy={busy}
-                onChange={changed}
+            <Routes>
+              <Route
+                path="/applications"
+                element={
+                  <Page title={applicationsTitle}>
+                    <ApplicationsPage
+                      data={data}
+                      busy={busy}
+                      onOpen={open}
+                      onRefresh={refreshData}
+                    />
+                  </Page>
+                }
               />
-            )}
-            {tab === "vehicles" && <VehiclesPage vehicles={data.vehicles} />}
-            {tab === "admin" && (
-              <Admin user={user} run={run} busy={busy} onError={setError} />
-            )}
+              <Route
+                path="/applications/:reference"
+                element={
+                  <Page title="Application details">
+                    <ApplicationDetailsPage
+                      user={user}
+                      run={run}
+                      busy={busy}
+                      onChange={refreshData}
+                    />
+                  </Page>
+                }
+              />
+              <Route
+                path="/new-registration"
+                element={
+                  owner ? (
+                    <Page title="New registration">
+                      <NewRegistrationPage
+                        ownerId={user.id}
+                        run={run}
+                        busy={busy}
+                        onChange={changed}
+                      />
+                    </Page>
+                  ) : (
+                    <Navigate to="/applications" replace />
+                  )
+                }
+              />
+              <Route
+                path="/vehicles"
+                element={
+                  owner ? (
+                    <Page title="My vehicles">
+                      <VehiclesPage vehicles={data.vehicles} />
+                    </Page>
+                  ) : (
+                    <Navigate to="/applications" replace />
+                  )
+                }
+              />
+              <Route
+                path="/administration"
+                element={
+                  administrator ? (
+                    <Page title="Administration">
+                      <Admin
+                        user={user}
+                        run={run}
+                        busy={busy}
+                        onError={setError}
+                      />
+                    </Page>
+                  ) : (
+                    <Navigate to="/applications" replace />
+                  )
+                }
+              />
+              <Route
+                path="*"
+                element={<Navigate to="/applications" replace />}
+              />
+            </Routes>
           </main>
         </div>
       )}

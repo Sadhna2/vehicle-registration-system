@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:5173", "http://127.0.0.1:5173"})
+@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"})
 @RequestMapping("/api/applications")
 public class VehicleRegistrationApplicationController {
     @Autowired

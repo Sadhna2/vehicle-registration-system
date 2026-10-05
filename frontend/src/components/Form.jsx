@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useState } from "react";
 import { label } from "../api";
 export default function Form({
   fields,
@@ -8,7 +8,7 @@ export default function Form({
   busy = false,
 }) {
   const [values, setValues] = useState(initial);
-  const formId = useId();
+  const [formId] = useState(() => `form-${crypto.randomUUID()}`);
   return (
     <form
       onSubmit={(e) => {

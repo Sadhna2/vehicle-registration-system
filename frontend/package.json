@@ -2,22 +2,34 @@
   "name": "vehicle-registration-frontend",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
   "scripts": {
-    "dev": "vite --host 127.0.0.1 --configLoader native",
-    "build": "vite build --configLoader native",
-    "preview": "vite preview --configLoader native",
-    "format": "prettier --write src vite.config.js",
-    "format:check": "prettier --check src vite.config.js"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test"
   },
   "dependencies": {
     "bootstrap": "^5.3.8",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-scripts": "5.0.1",
+    "react-router-dom": "^7.18.4"
   },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^5.0.0",
-    "prettier": "^3.9.9",
-    "vite": "^7.1.0"
+  "proxy": "http://localhost:8080",
+  "eslintConfig": {
+    "extends": [
+      "react-app"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

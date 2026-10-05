@@ -27,6 +27,7 @@
   gap: 9px;
 }
 .nav-item {
+    text-decoration: none;
   text-align: left;
   border: 0;
   background: none;

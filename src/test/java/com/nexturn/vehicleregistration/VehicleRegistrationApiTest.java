@@ -239,8 +239,8 @@ class VehicleRegistrationApiTest {
     }
 
     @Test void corsAndMalformedRequestsAreHandled() throws Exception {
-        HttpResponse<String> allowed=raw("OPTIONS","/api/applications",null,Map.of("Origin","http://localhost:5173","Access-Control-Request-Method","POST","Access-Control-Request-Headers","content-type"));
-        assertEquals(200,allowed.statusCode());assertEquals("http://localhost:5173",allowed.headers().firstValue("Access-Control-Allow-Origin").orElse(""));
+        HttpResponse<String> allowed=raw("OPTIONS","/api/applications",null,Map.of("Origin","http://localhost:3000","Access-Control-Request-Method","POST","Access-Control-Request-Headers","content-type"));
+        assertEquals(200,allowed.statusCode());assertEquals("http://localhost:3000",allowed.headers().firstValue("Access-Control-Allow-Origin").orElse(""));
         assertEquals(403,raw("OPTIONS","/api/applications",null,Map.of("Origin","https://unrelated.example","Access-Control-Request-Method","POST")).statusCode());
         assertEquals(400,raw("POST","/api/auth/signup","{bad",Map.of()).statusCode());
     }
