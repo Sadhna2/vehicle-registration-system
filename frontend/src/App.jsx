@@ -6,7 +6,7 @@ import {
   Routes,
   useNavigate,
 } from "react-router-dom";
-import { label } from "./api";
+import { api, label } from "./api";
 import Auth from "./components/Auth";
 import Admin from "./components/Admin";
 import ApplicationDetailsPage from "./components/ApplicationDetailsPage";
@@ -52,7 +52,12 @@ export default function App() {
     refreshData();
     open(result.reference);
   };
-  const signOut = () => {
+  const signOut = async () => {
+    try {
+      await api("/auth/logout", "POST");
+    } catch {
+      // The token may already be expired or revoked; signing out locally is enough.
+    }
     setUser(null);
     setError("");
     navigate("/login", { replace: true });
@@ -103,8 +108,8 @@ export default function App() {
               <Auth
                 run={run}
                 busy={busy}
-                onLogin={(account) => {
-                  setUser(account);
+                onLogin={(authentication) => {
+                  setUser(authentication);
                   navigate("/applications", { replace: true });
                 }}
               />
@@ -135,6 +140,8 @@ export default function App() {
                   <Page title={applicationsTitle}>
                     <ApplicationsPage
                       data={data}
+                      user={user}
+                      run={run}
                       busy={busy}
                       onOpen={open}
                       onRefresh={refreshData}
@@ -161,7 +168,6 @@ export default function App() {
                   owner ? (
                     <Page title="New registration">
                       <NewRegistrationPage
-                        ownerId={user.id}
                         run={run}
                         busy={busy}
                         onChange={changed}

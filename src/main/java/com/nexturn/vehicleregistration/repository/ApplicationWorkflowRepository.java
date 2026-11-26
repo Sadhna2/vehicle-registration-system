@@ -48,4 +48,8 @@ public interface ApplicationWorkflowRepository
       group by a.applicationStatus
       """)
   List<StatusCount> countStatuses();
+
+  boolean existsByFeeRuleFeeRuleId(Long feeRuleId);
+
+  long countByVehicleTemporaryregisterNo(Long vehicleId);
 }

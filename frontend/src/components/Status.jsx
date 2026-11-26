@@ -1,7 +1,7 @@
 import { label } from "../api";
 export default function Status({ value }) {
   const color =
-    value === "APPROVED"
+    value === "APPROVED" || value === "VERIFIED"
       ? "success"
       : value === "REJECTED"
         ? "danger"

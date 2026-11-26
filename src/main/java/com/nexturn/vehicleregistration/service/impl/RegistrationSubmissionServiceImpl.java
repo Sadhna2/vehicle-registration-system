@@ -13,11 +13,14 @@ import com.nexturn.vehicleregistration.exception.ApplicationIdNotFoundException;
 import com.nexturn.vehicleregistration.exception.FeeRuleNotFoundException;
 import com.nexturn.vehicleregistration.exception.OwnerNotFoundException;
 import com.nexturn.vehicleregistration.repository.ApplicationWorkflowRepository;
+import com.nexturn.vehicleregistration.repository.OwnerPaymentRepository;
 import com.nexturn.vehicleregistration.repository.OwnerRepository;
 import com.nexturn.vehicleregistration.repository.RegistrationFeeRuleRepository;
 import com.nexturn.vehicleregistration.repository.VechileRepository;
+import com.nexturn.vehicleregistration.security.AccessRules;
 import com.nexturn.vehicleregistration.service.ApplicationQueryService;
 import com.nexturn.vehicleregistration.service.AuditService;
+import com.nexturn.vehicleregistration.service.DocumentService;
 import com.nexturn.vehicleregistration.service.RegistrationSubmissionService;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -51,6 +54,45 @@ public class RegistrationSubmissionServiceImpl
     @Autowired
     private AuditService auditService;
 
+    @Autowired
+    private DocumentService documentService;
+
+    @Autowired
+    private OwnerPaymentRepository paymentRepository;
+
+    @Override
+    public void withdraw(String referenceNumber, Long ownerId) {
+        VehicleRegistrationApplication application = applicationRepository
+                .locked(referenceNumber)
+                .orElseThrow(
+                        () -> new ApplicationIdNotFoundException(referenceNumber));
+
+        AccessRules.requireApplicant(application, ownerId);
+
+        ensure(
+                application.getApplicationStatus() == ApplicationStatus.SUBMITTED
+                        || application.getApplicationStatus()
+                                == ApplicationStatus.CORRECTION_REQUIRED,
+                "Only applications that are submitted or awaiting correction can be withdrawn");
+
+        ensure(
+                paymentRepository
+                        .findByApplicationApplicationRefNo(referenceNumber)
+                        .isEmpty(),
+                "Paid applications cannot be withdrawn");
+
+        auditService.record(application, "APPLICATION_WITHDRAWN", null);
+
+        Vehicle vehicle = application.getVehicle();
+        documentService.deleteAllFor(referenceNumber);
+        applicationRepository.delete(application);
+        applicationRepository.flush();
+        if (applicationRepository.countByVehicleTemporaryregisterNo(
+                vehicle.getTemporaryregisterNo()) == 0) {
+            vehicleRepository.delete(vehicle);
+        }
+    }
+
     @Override
     public ApplicationDetailsResponse submit(
             NewVehicleRegistrationRequest request, Long ownerId) {
@@ -74,11 +116,13 @@ public class RegistrationSubmissionServiceImpl
     @Override
     public ApplicationDetailsResponse correct(
             String referenceNumber,
-            NewVehicleRegistrationRequest request) {
+            NewVehicleRegistrationRequest request, Long ownerId) {
         VehicleRegistrationApplication application = applicationRepository
                 .locked(referenceNumber)
                 .orElseThrow(
                         () -> new ApplicationIdNotFoundException(referenceNumber));
+
+        AccessRules.requireApplicant(application, ownerId);
 
         ensure(
                 application.getApplicationStatus()
@@ -89,6 +133,9 @@ public class RegistrationSubmissionServiceImpl
                 application.getVehicle().getVehicleCategory()
                         == request.vehicleCategory(),
                 "Vehicle category cannot change after fee quotation");
+
+        documentService.requireAllUploaded(referenceNumber);
+        documentService.requireNoneRejected(referenceNumber);
 
         updateVehicle(application.getVehicle(), request);
 

@@ -22,6 +22,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
@@ -53,8 +56,16 @@ public class GlobalExceptionHandler {
     PaymentRequiredException.class,
     RecordNotFoundException.class,
     ReferenceNumberNotFoundException.class,
-    RegistrationCertificateNotFoundException.class
+    RegistrationCertificateNotFoundException.class,
 
+    AccessDeniedException.class,
+    InvalidTokenException.class,
+    TokenExpiredException.class,
+    JwtConfigurationException.class,
+
+    InvalidDocumentException.class,
+    DocumentNotFoundException.class,
+    DocumentStorageException.class
   })
   public ResponseEntity<ProblemDetail> applicationError(RuntimeException error) {
     ApiError details = (ApiError) error;
@@ -122,6 +133,18 @@ public class GlobalExceptionHandler {
         HttpStatus.CONFLICT,
         "CONCURRENT_UPDATE",
         "Record changed concurrently. Refresh and retry.");
+  }
+
+  @ExceptionHandler(MaxUploadSizeExceededException.class)
+  public ResponseEntity<ProblemDetail> tooLarge(MaxUploadSizeExceededException error) {
+    return problem(
+        HttpStatus.CONTENT_TOO_LARGE, "FILE_TOO_LARGE", "The file is larger than the 5 MB limit.");
+  }
+
+  @ExceptionHandler({MissingServletRequestPartException.class, MultipartException.class})
+  public ResponseEntity<ProblemDetail> badUpload(Exception error) {
+    return problem(
+        HttpStatus.BAD_REQUEST, "INVALID_DOCUMENT", "Send the document as a file upload.");
   }
 
   @ExceptionHandler(NoResourceFoundException.class)

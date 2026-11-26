@@ -7,6 +7,9 @@ import com.nexturn.vehicleregistration.dto.response.OwnerResponse;
 import com.nexturn.vehicleregistration.dto.response.RTOEmployeeResponse;
 import com.nexturn.vehicleregistration.entity.Owner;
 import com.nexturn.vehicleregistration.entity.RTOEmployee;
+import com.nexturn.vehicleregistration.enums.RTOEmployeeRole;
+import com.nexturn.vehicleregistration.enums.SessionRole;
+import com.nexturn.vehicleregistration.exception.AccessDeniedException;
 import com.nexturn.vehicleregistration.exception.DuplicateRecordException;
 import com.nexturn.vehicleregistration.exception.EmployeeNotFoundException;
 import com.nexturn.vehicleregistration.exception.InvalidRequestException;
@@ -46,7 +49,13 @@ public class RTOEmployeeServiceImpl implements RTOEmployeeService {
 
     @Override
     public RTOEmployeeResponse employee(
-            RTOEmployeeRequest request) {
+            RTOEmployeeRequest request, SessionRole creatorRole) {
+        if (creatorRole != SessionRole.SYSTEM_ADMIN
+                && request.role() != RTOEmployeeRole.RTO_OFFICER) {
+            throw new AccessDeniedException(
+                    "RTO administrators can only create RTO officer accounts");
+        }
+
         String email = request.emailAddress()
                 .trim()
                 .toLowerCase(Locale.ROOT);
@@ -89,11 +98,14 @@ public class RTOEmployeeServiceImpl implements RTOEmployeeService {
     public void account(
             String accountType,
             Long accountId,
-            AccountRequest request) {
+            AccountRequest request, Long actingEmployeeId) {
         if ("owners".equals(accountType)) {
             updateOwner(accountId, request);
 
         } else if ("employees".equals(accountType)) {
+            ensure(
+                    !accountId.equals(actingEmployeeId),
+                    "You cannot change your own account status or role");
             updateEmployee(accountId, request);
 
         } else {

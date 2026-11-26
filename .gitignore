@@ -16,3 +16,7 @@ frontend/dist/
 frontend/.env
 frontend/.env.local
 frontend/*.log
+
+# Uploaded application documents (personal data) - never commit
+uploads/
+config/preview-accounts.md

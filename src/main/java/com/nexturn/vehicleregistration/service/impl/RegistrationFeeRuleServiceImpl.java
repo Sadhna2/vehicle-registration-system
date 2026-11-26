@@ -5,6 +5,8 @@ import com.nexturn.vehicleregistration.dto.request.RegistrationFeeRuleRequest;
 import com.nexturn.vehicleregistration.dto.response.RegistrationFeeRuleResponse;
 import com.nexturn.vehicleregistration.entity.RegistrationFeeRule;
 import com.nexturn.vehicleregistration.enums.ApplicationType;
+import com.nexturn.vehicleregistration.exception.RecordNotFoundException;
+import com.nexturn.vehicleregistration.repository.ApplicationWorkflowRepository;
 import com.nexturn.vehicleregistration.repository.RegistrationFeeRuleRepository;
 import com.nexturn.vehicleregistration.service.AuditService;
 import com.nexturn.vehicleregistration.service.RegistrationFeeRuleService;
@@ -23,6 +25,24 @@ public class RegistrationFeeRuleServiceImpl
 
     @Autowired
     private AuditService auditService;
+
+    @Autowired
+    private ApplicationWorkflowRepository applicationRepository;
+
+    @Override
+    public void delete(Long feeRuleId) {
+        RegistrationFeeRule feeRule = feeRuleRepository.findById(feeRuleId)
+                .orElseThrow(() -> new RecordNotFoundException("Fee rule not found: " + feeRuleId));
+        ensure(
+                !applicationRepository.existsByFeeRuleFeeRuleId(feeRuleId),
+                "This fee rule is used by existing applications and cannot be deleted");
+        feeRuleRepository.delete(feeRule);
+        auditService.record(
+                null,
+                "FEE_DELETED",
+                feeRule.getVehicleCategory() + " " + feeRule.getFeeAmount()
+                        + " from " + feeRule.getEffectiveFrom());
+    }
 
     @Override
     @Transactional(readOnly = true)

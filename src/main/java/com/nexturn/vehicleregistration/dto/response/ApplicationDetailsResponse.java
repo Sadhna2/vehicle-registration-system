@@ -6,6 +6,7 @@ import com.nexturn.vehicleregistration.enums.FinalResult;
 import com.nexturn.vehicleregistration.enums.InspectionStatus;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.time.LocalDate;
 
 public record ApplicationDetailsResponse(
@@ -35,4 +36,5 @@ public record ApplicationDetailsResponse(
     VehicleResponse vehicle,
     OwnerResponse applicant,
     OwnerPaymentDetailResponse payment,
-    RegistrationCertificateResponse certificate) {}
+    RegistrationCertificateResponse certificate,
+    List<ApplicationDocumentResponse> documents) {}

@@ -7,7 +7,7 @@ export default function useRegistrationData(user, refresh) {
   const [data, setData] = useState(empty);
   const [error, setError] = useState("");
   const [loaded, setLoaded] = useState(false);
-  const ownerId = user?.role === "OWNER" ? user.id : null;
+  const owner = user?.role === "OWNER";
   const userId = user?.id;
   useEffect(() => {
     let active = true;
@@ -18,8 +18,8 @@ export default function useRegistrationData(user, refresh) {
     async function load() {
       try {
         const [applications, vehicles] = await Promise.all([
-          api(`/applications${ownerId ? `?ownerId=${ownerId}` : ""}`),
-          ownerId ? api(`/vehicles?ownerId=${ownerId}`) : Promise.resolve([]),
+          api("/applications"),
+          owner ? api("/vehicles") : Promise.resolve([]),
         ]);
         if (active) {
           setData({ applications, vehicles });
@@ -34,6 +34,6 @@ export default function useRegistrationData(user, refresh) {
     return () => {
       active = false;
     };
-  }, [userId, ownerId, refresh]);
+  }, [userId, owner, refresh]);
   return { ...data, loaded, error, clearError: () => setError("") };
 }

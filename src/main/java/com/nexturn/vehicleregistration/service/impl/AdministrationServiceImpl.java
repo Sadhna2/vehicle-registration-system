@@ -11,6 +11,7 @@ import com.nexturn.vehicleregistration.service.AdministrationService;
 import com.nexturn.vehicleregistration.service.RTOEmployeeService;
 import com.nexturn.vehicleregistration.service.RegistrationFeeRuleService;
 import com.nexturn.vehicleregistration.service.ReportService;
+import com.nexturn.vehicleregistration.enums.SessionRole;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +46,8 @@ public class AdministrationServiceImpl implements AdministrationService {
 
     @Override
     public RTOEmployeeResponse employee(
-            RTOEmployeeRequest request) {
-        return employeeService.employee(request);
+            RTOEmployeeRequest request, SessionRole creatorRole) {
+        return employeeService.employee(request, creatorRole);
     }
 
     @Override
@@ -58,8 +59,8 @@ public class AdministrationServiceImpl implements AdministrationService {
     public void account(
             String accountType,
             Long accountId,
-            AccountRequest request) {
-        employeeService.account(accountType, accountId, request);
+            AccountRequest request, Long actingEmployeeId) {
+        employeeService.account(accountType, accountId, request, actingEmployeeId);
     }
 
     @Override

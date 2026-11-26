@@ -10,4 +10,7 @@ public interface RegistrationFeeRuleService {
 
     RegistrationFeeRuleResponse fee(
             RegistrationFeeRuleRequest request);
+
+    /** Deletes a fee rule that no application uses (for example one created by mistake). */
+    void delete(Long feeRuleId);
 }

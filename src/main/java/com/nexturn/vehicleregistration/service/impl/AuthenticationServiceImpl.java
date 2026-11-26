@@ -2,14 +2,15 @@ package com.nexturn.vehicleregistration.service.impl;
 
 import com.nexturn.vehicleregistration.dto.request.LoginRequest;
 import com.nexturn.vehicleregistration.dto.request.OwnerRequest;
-import com.nexturn.vehicleregistration.dto.response.LoginResponse;
 import com.nexturn.vehicleregistration.entity.Owner;
 import com.nexturn.vehicleregistration.entity.RTOEmployee;
 import com.nexturn.vehicleregistration.enums.AccountStatus;
+import com.nexturn.vehicleregistration.enums.SessionRole;
 import com.nexturn.vehicleregistration.exception.DuplicateRecordException;
 import com.nexturn.vehicleregistration.exception.InvalidLoginException;
 import com.nexturn.vehicleregistration.repository.OwnerRepository;
 import com.nexturn.vehicleregistration.repository.RTOEmployeeRepository;
+import com.nexturn.vehicleregistration.security.Actor;
 import com.nexturn.vehicleregistration.service.AuthenticationService;
 import com.nexturn.vehicleregistration.util.PasswordUtil;
 import java.util.Locale;
@@ -28,7 +29,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     @Transactional
-    public LoginResponse signup(OwnerRequest request) {
+    public Actor signup(OwnerRequest request) {
         String email = request.emailAddress()
                 .trim()
                 .toLowerCase(Locale.ROOT);
@@ -55,14 +56,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         Owner savedOwner = ownerRepository.save(owner);
 
-        return new LoginResponse(
+        return new Actor(
                 savedOwner.getOwnerId(),
-                savedOwner.getFirstName(),
-                "OWNER");
+                SessionRole.OWNER,
+                savedOwner.getFirstName());
     }
 
     @Override
-    public LoginResponse login(LoginRequest request) {
+    public Actor login(LoginRequest request) {
         String email = request.email()
                 .trim()
                 .toLowerCase(Locale.ROOT);
@@ -74,7 +75,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return loginOwner(email, request.password());
     }
 
-    private LoginResponse loginEmployee(String email, String password) {
+    private Actor loginEmployee(String email, String password) {
         RTOEmployee employee = employeeRepository
                 .findByEmailAddress(email)
                 .orElseThrow(this::invalidLogin);
@@ -84,13 +85,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw invalidLogin();
         }
 
-        return new LoginResponse(
+        return new Actor(
                 employee.getEmployeeId(),
-                employee.getFirstName(),
-                employee.getRole().name());
+                SessionRole.of(employee.getRole()),
+                employee.getFirstName());
     }
 
-    private LoginResponse loginOwner(String email, String password) {
+    private Actor loginOwner(String email, String password) {
         Owner owner = ownerRepository
                 .findByEmailAddress(email)
                 .orElseThrow(this::invalidLogin);
@@ -100,10 +101,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw invalidLogin();
         }
 
-        return new LoginResponse(
+        return new Actor(
                 owner.getOwnerId(),
-                owner.getFirstName(),
-                "OWNER");
+                SessionRole.OWNER,
+                owner.getFirstName());
     }
 
     private InvalidLoginException invalidLogin() {

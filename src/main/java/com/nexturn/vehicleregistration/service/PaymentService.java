@@ -6,5 +6,5 @@ import com.nexturn.vehicleregistration.dto.response.ApplicationDetailsResponse;
 public interface PaymentService {
     ApplicationDetailsResponse pay(
             String referenceNumber,
-            PaymentRequest request);
+            PaymentRequest request, Long ownerId);
 }

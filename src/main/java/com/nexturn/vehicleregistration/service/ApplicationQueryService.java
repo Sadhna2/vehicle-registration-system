@@ -14,11 +14,12 @@ public interface ApplicationQueryService {
 
     List<ApplicationSummaryResponse> list(Long ownerId);
 
+    /** {@code ownerId} is the calling owner's id, or null for staff (no ownership check). */
     ApplicationDetailsResponse get(
-            String referenceNumber);
+            String referenceNumber, Long ownerId);
 
     List<VehicleResponse> vehicles(Long ownerId);
 
     RegistrationCertificateResponse certificate(
-            String referenceNumber);
+            String referenceNumber, Long ownerId);
 }
