@@ -9,5 +9,11 @@ public interface RegistrationSubmissionService {
 
     ApplicationDetailsResponse correct(
             String referenceNumber,
-            NewVehicleRegistrationRequest request);
+            NewVehicleRegistrationRequest request, Long ownerId);
+
+    /**
+     * The owner deletes their own application while it is unpaid and not yet under review
+     * (submitted or awaiting correction), together with its vehicle record and documents.
+     */
+    void withdraw(String referenceNumber, Long ownerId);
 }

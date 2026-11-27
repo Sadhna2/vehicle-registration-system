@@ -6,6 +6,7 @@ export default function Form({
   onSubmit,
   button = "Save",
   busy = false,
+  children,
 }) {
   const [values, setValues] = useState(initial);
   const [formId] = useState(() => `form-${crypto.randomUUID()}`);
@@ -67,6 +68,7 @@ export default function Form({
           )}
         </div>
       ))}
+      {children}
       <div className="col-12">
         <button disabled={busy} className="btn btn-primary" type="submit">
           {busy ? "Saving…" : button}

@@ -11,6 +11,7 @@ import com.nexturn.vehicleregistration.exception.ApplicationIdNotFoundException;
 import com.nexturn.vehicleregistration.exception.PaymentAmountMismatchException;
 import com.nexturn.vehicleregistration.repository.ApplicationWorkflowRepository;
 import com.nexturn.vehicleregistration.repository.OwnerPaymentRepository;
+import com.nexturn.vehicleregistration.security.AccessRules;
 import com.nexturn.vehicleregistration.service.ApplicationQueryService;
 import com.nexturn.vehicleregistration.service.AuditService;
 import com.nexturn.vehicleregistration.service.PaymentService;
@@ -38,11 +39,13 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public ApplicationDetailsResponse pay(
             String referenceNumber,
-            PaymentRequest request) {
+            PaymentRequest request, Long ownerId) {
         VehicleRegistrationApplication application = applicationRepository
                 .locked(referenceNumber)
                 .orElseThrow(
                         () -> new ApplicationIdNotFoundException(referenceNumber));
+
+        AccessRules.requireApplicant(application, ownerId);
 
         ensure(
                 application.getApplicationStatus() != ApplicationStatus.REJECTED

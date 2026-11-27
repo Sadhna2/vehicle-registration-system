@@ -1,8 +1,11 @@
+import { documentSummary } from "../documents";
+
 export default function Progress({ data }) {
   const verified = ["INSPECTION_PENDING", "APPROVED"].includes(data.status);
   const steps = [
     ["Application submitted", true],
     ["Fee payment", data.paid],
+    ["Documents verified", documentSummary(data.documents).allVerified],
     ["Verification", verified],
     ["Inspection passed", data.inspectionStatus === "PASSED"],
     ["RC issued", data.status === "APPROVED"],

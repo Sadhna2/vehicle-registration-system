@@ -24,6 +24,7 @@ import com.nexturn.vehicleregistration.repository.RegistrationCertificateReposit
 import com.nexturn.vehicleregistration.service.ApplicationQueryService;
 import com.nexturn.vehicleregistration.service.ApplicationReviewService;
 import com.nexturn.vehicleregistration.service.AuditService;
+import com.nexturn.vehicleregistration.service.DocumentService;
 import java.time.Instant;
 import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,9 @@ public class ApplicationReviewServiceImpl implements ApplicationReviewService {
 
     @Autowired
     private AuditService auditService;
+
+    @Autowired
+    private DocumentService documentService;
 
     @Value("${vrs.registration.validity-years:15}")
     private int registrationYears;
@@ -124,6 +128,8 @@ public class ApplicationReviewServiceImpl implements ApplicationReviewService {
                 application.getApplicationStatus() == ApplicationStatus.SUBMITTED,
                 "Application must be submitted before verification");
 
+        documentService.requireAllUploaded(application.getApplicationRefNo());
+
         application.setApplicationStatus(ApplicationStatus.UNDER_VERIFICATION);
     }
 
@@ -154,6 +160,8 @@ public class ApplicationReviewServiceImpl implements ApplicationReviewService {
                 application.getApplicationStatus()
                         == ApplicationStatus.UNDER_VERIFICATION,
                 "Start verification first");
+
+        documentService.requireAllVerified(application.getApplicationRefNo());
 
         application.setApplicationStatus(ApplicationStatus.INSPECTION_PENDING);
         application.setVerificationRemark(remarks);

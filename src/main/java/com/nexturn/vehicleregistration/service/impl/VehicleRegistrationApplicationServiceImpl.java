@@ -7,6 +7,7 @@ import com.nexturn.vehicleregistration.dto.response.ApplicationDetailsResponse;
 import com.nexturn.vehicleregistration.dto.response.ApplicationSummaryResponse;
 import com.nexturn.vehicleregistration.dto.response.RegistrationCertificateResponse;
 import com.nexturn.vehicleregistration.dto.response.VehicleResponse;
+import com.nexturn.vehicleregistration.enums.ApplicationStatus;
 import com.nexturn.vehicleregistration.service.ApplicationQueryService;
 import com.nexturn.vehicleregistration.service.ApplicationReviewService;
 import com.nexturn.vehicleregistration.service.PaymentService;
@@ -40,16 +41,16 @@ public class VehicleRegistrationApplicationServiceImpl
     @Override
     public ApplicationDetailsResponse correct(
             String referenceNumber,
-            NewVehicleRegistrationRequest request) {
+            NewVehicleRegistrationRequest request, Long ownerId) {
         return registrationSubmissionService.correct(
-                referenceNumber, request);
+                referenceNumber, request, ownerId);
     }
 
     @Override
     public ApplicationDetailsResponse pay(
             String referenceNumber,
-            PaymentRequest request) {
-        return paymentService.pay(referenceNumber, request);
+            PaymentRequest request, Long ownerId) {
+        return paymentService.pay(referenceNumber, request, ownerId);
     }
 
     @Override
@@ -61,14 +62,14 @@ public class VehicleRegistrationApplicationServiceImpl
     }
 
     @Override
-    public List<ApplicationSummaryResponse> list(Long ownerId) {
-        return applicationQueryService.list(ownerId);
+    public List<ApplicationSummaryResponse> list(Long ownerId, ApplicationStatus status) {
+        return applicationQueryService.list(ownerId, status);
     }
 
     @Override
     public ApplicationDetailsResponse get(
-            String referenceNumber) {
-        return applicationQueryService.get(referenceNumber);
+            String referenceNumber, Long ownerId) {
+        return applicationQueryService.get(referenceNumber, ownerId);
     }
 
     @Override
@@ -78,7 +79,7 @@ public class VehicleRegistrationApplicationServiceImpl
 
     @Override
     public RegistrationCertificateResponse certificate(
-            String referenceNumber) {
-        return applicationQueryService.certificate(referenceNumber);
+            String referenceNumber, Long ownerId) {
+        return applicationQueryService.certificate(referenceNumber, ownerId);
     }
 }

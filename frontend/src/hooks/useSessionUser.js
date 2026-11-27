@@ -1,30 +1,23 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { clearSession, readSession, saveSession, SESSION_EVENT } from "../session";
 
-const key = "vrs.user";
-
-function readUser() {
-  try {
-    const user = JSON.parse(sessionStorage.getItem(key));
-    return user?.id &&
-      typeof user.name === "string" &&
-      ["OWNER", "RTO_OFFICER", "RTO_ADMIN", "SYSTEM_ADMIN"].includes(user.role)
-      ? { id: user.id, name: user.name, role: user.role }
-      : null;
-  } catch {
-    return null;
-  }
-}
-
+/**
+ * The signed-in user ({ id, name, role }) taken from the stored JWT session.
+ * The session is cleared when the token expires or the API rejects it (401).
+ */
 export default function useSessionUser() {
-  const [user, setUser] = useState(readUser);
-  function updateUser(account) {
-    if (account) {
-      const { id, name, role } = account;
-      sessionStorage.setItem(key, JSON.stringify({ id, name, role }));
-    } else {
-      sessionStorage.removeItem(key);
-    }
-    setUser(account);
-  }
+  const [user, setUser] = useState(() => readSession()?.user ?? null);
+
+  useEffect(() => {
+    const sync = () => setUser(readSession()?.user ?? null);
+    window.addEventListener(SESSION_EVENT, sync);
+    return () => window.removeEventListener(SESSION_EVENT, sync);
+  }, []);
+
+  const updateUser = useCallback((authentication) => {
+    if (authentication) saveSession(authentication);
+    else clearSession();
+  }, []);
+
   return [user, updateUser];
 }

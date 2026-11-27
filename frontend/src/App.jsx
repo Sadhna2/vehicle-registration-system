@@ -6,11 +6,13 @@ import {
   Routes,
   useNavigate,
 } from "react-router-dom";
-import { label } from "./api";
+import { api, label } from "./api";
 import Auth from "./components/Auth";
 import Admin from "./components/Admin";
 import ApplicationDetailsPage from "./components/ApplicationDetailsPage";
 import ApplicationsPage from "./components/ApplicationsPage";
+import FeeRulesPage from "./components/FeeRulesPage";
+import StatusSearchPage from "./components/StatusSearchPage";
 import NewRegistrationPage from "./components/NewRegistrationPage";
 import VehiclesPage from "./components/VehiclesPage";
 import useAction from "./hooks/useAction";
@@ -35,6 +37,8 @@ export default function App() {
   const owner = user?.role === "OWNER";
   const administrator = ["RTO_ADMIN", "SYSTEM_ADMIN"].includes(user?.role);
   const applicationsTitle = owner ? "My applications" : "Review queue";
+  // Left menu. Staff (officers, RTO admins, system admins) also get the status search;
+  // RTO and system administrators get the fee rules and administration pages.
   const navigation = [
     ["/applications", applicationsTitle],
     ...(owner
@@ -42,8 +46,13 @@ export default function App() {
           ["/new-registration", "New registration"],
           ["/vehicles", "My vehicles"],
         ]
+      : [["/status-search", "Status search"]]),
+    ...(administrator
+      ? [
+          ["/fee-rules", "Fee rules"],
+          ["/administration", "Administration"],
+        ]
       : []),
-    ...(administrator ? [["/administration", "Administration"]] : []),
   ];
   const refreshData = () => setRefresh((value) => value + 1);
   const open = (reference) =>
@@ -52,7 +61,12 @@ export default function App() {
     refreshData();
     open(result.reference);
   };
-  const signOut = () => {
+  const signOut = async () => {
+    try {
+      await api("/auth/logout", "POST");
+    } catch {
+      // The token may already be expired or revoked; signing out locally is enough.
+    }
     setUser(null);
     setError("");
     navigate("/login", { replace: true });
@@ -103,8 +117,8 @@ export default function App() {
               <Auth
                 run={run}
                 busy={busy}
-                onLogin={(account) => {
-                  setUser(account);
+                onLogin={(authentication) => {
+                  setUser(authentication);
                   navigate("/applications", { replace: true });
                 }}
               />
@@ -135,11 +149,44 @@ export default function App() {
                   <Page title={applicationsTitle}>
                     <ApplicationsPage
                       data={data}
+                      user={user}
+                      run={run}
                       busy={busy}
                       onOpen={open}
                       onRefresh={refreshData}
                     />
                   </Page>
+                }
+              />
+              <Route
+                path="/status-search"
+                element={
+                  owner ? (
+                    <Navigate to="/applications" replace />
+                  ) : (
+                    <Page title="Status search">
+                      <StatusSearchPage
+                        data={data}
+                        user={user}
+                        run={run}
+                        busy={busy}
+                        onOpen={open}
+                        onRefresh={refreshData}
+                      />
+                    </Page>
+                  )
+                }
+              />
+              <Route
+                path="/fee-rules"
+                element={
+                  administrator ? (
+                    <Page title="Fee rules">
+                      <FeeRulesPage user={user} run={run} busy={busy} onError={setError} />
+                    </Page>
+                  ) : (
+                    <Navigate to="/applications" replace />
+                  )
                 }
               />
               <Route
@@ -161,7 +208,6 @@ export default function App() {
                   owner ? (
                     <Page title="New registration">
                       <NewRegistrationPage
-                        ownerId={user.id}
                         run={run}
                         busy={busy}
                         onChange={changed}

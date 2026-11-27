@@ -11,12 +11,16 @@ import com.nexturn.vehicleregistration.entity.OwnerPaymentDetail;
 import com.nexturn.vehicleregistration.entity.RegistrationCertificate;
 import com.nexturn.vehicleregistration.entity.Vehicle;
 import com.nexturn.vehicleregistration.entity.VehicleRegistrationApplication;
+import com.nexturn.vehicleregistration.enums.ApplicationStatus;
 import com.nexturn.vehicleregistration.exception.ReferenceNumberNotFoundException;
 import com.nexturn.vehicleregistration.exception.RegistrationCertificateNotFoundException;
+import com.nexturn.vehicleregistration.dto.response.ApplicationDocumentResponse;
+import com.nexturn.vehicleregistration.repository.ApplicationDocumentRepository;
 import com.nexturn.vehicleregistration.repository.ApplicationWorkflowRepository;
 import com.nexturn.vehicleregistration.repository.OwnerPaymentRepository;
 import com.nexturn.vehicleregistration.repository.RegistrationCertificateRepository;
 import com.nexturn.vehicleregistration.repository.VechileRepository;
+import com.nexturn.vehicleregistration.security.AccessRules;
 import com.nexturn.vehicleregistration.service.ApplicationQueryService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +43,9 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
     @Autowired
     private RegistrationCertificateRepository certificateRepository;
 
+    @Autowired
+    private ApplicationDocumentRepository documentRepository;
+
     @Override
     public ApplicationDetailsResponse detail(
             VehicleRegistrationApplication application) {
@@ -55,11 +62,18 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
     }
 
     @Override
-    public List<ApplicationSummaryResponse> list(Long ownerId) {
+    public List<ApplicationSummaryResponse> list(Long ownerId, ApplicationStatus status) {
         Sort sort = Sort.by("submittedDate").descending();
-        List<VehicleRegistrationApplication> applications = ownerId == null
-                ? applicationRepository.findAll(sort)
-                : applicationRepository.findByApplicantOwnerId(ownerId, sort);
+        List<VehicleRegistrationApplication> applications;
+        if (ownerId == null) {
+            applications = status == null
+                    ? applicationRepository.findAll(sort)
+                    : applicationRepository.findByApplicationStatus(status, sort);
+        } else {
+            applications = status == null
+                    ? applicationRepository.findByApplicantOwnerId(ownerId, sort)
+                    : applicationRepository.findByApplicantOwnerIdAndApplicationStatus(ownerId, status, sort);
+        }
         return applications.stream()
                 .map(this::toApplicationSummaryResponse)
                 .toList();
@@ -67,10 +81,12 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 
     @Override
     public ApplicationDetailsResponse get(
-            String referenceNumber) {
+            String referenceNumber, Long ownerId) {
         VehicleRegistrationApplication application =
                 applicationRepository.findById(referenceNumber)
                         .orElseThrow(() -> new ReferenceNumberNotFoundException(referenceNumber));
+
+        AccessRules.requireReadable(application, ownerId);
 
         return detail(application);
     }
@@ -86,10 +102,12 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 
     @Override
     public RegistrationCertificateResponse certificate(
-            String referenceNumber) {
+            String referenceNumber, Long ownerId) {
         VehicleRegistrationApplication application =
                 applicationRepository.findById(referenceNumber)
                         .orElseThrow(() -> new ReferenceNumberNotFoundException(referenceNumber));
+
+        AccessRules.requireReadable(application, ownerId);
 
         String registrationNumber = application.getVehicle()
                 .getRegistrationcertificateNumber();
@@ -173,7 +191,13 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
                 toVehicleResponse(application.getVehicle()),
                 toOwnerResponse(application.getApplicant()),
                 toPaymentResponse(payment),
-                toCertificateResponse(certificate));
+                toCertificateResponse(certificate),
+                documentRepository
+                        .findByApplicationApplicationRefNoOrderByDocumentTypeAsc(
+                                application.getApplicationRefNo())
+                        .stream()
+                        .map(ApplicationDocumentResponse::from)
+                        .toList());
     }
 
     private ApplicationSummaryResponse toApplicationSummaryResponse(VehicleRegistrationApplication a) {

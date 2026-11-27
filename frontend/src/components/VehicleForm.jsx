@@ -23,6 +23,7 @@ export default function VehicleForm({
   initial,
   busy,
   button = "Submit application",
+  children,
 }) {
   return (
     <Form
@@ -41,6 +42,8 @@ export default function VehicleForm({
           manufactureYear: Number(x.manufactureYear),
         })
       }
-    />
+    >
+      {children}
+    </Form>
   );
 }

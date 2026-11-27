@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { api, label, money, today } from "../api";
+import { api, downloadFile, label, money, today } from "../api";
 import Status from "./Status";
 import Form from "./Form";
 import VehicleForm from "./VehicleForm";
 import Progress from "./Progress";
 import RegistrationCertificate from "./RegistrationCertificate";
+import DocumentsPanel from "./DocumentsPanel";
+import { documentSummary } from "../documents";
 export default function Detail({ data, user, run, busy, onChange, onClose }) {
   const [remarks, setRemarks] = useState("");
   const [appointment, setAppointment] = useState(today());
@@ -13,11 +15,12 @@ export default function Detail({ data, user, run, busy, onChange, onClose }) {
   const applicant = owner && user.id === data.applicant.ownerId;
   const reviewer = ["RTO_OFFICER", "RTO_ADMIN"].includes(user.role);
   const closed = ["APPROVED", "REJECTED"].includes(data.status);
+  const documents = documentSummary(data.documents);
   const act = (path, method, body) =>
     run(async () =>
       onChange(
         await api(
-          `/applications/${encodeURIComponent(data.reference)}/${path}${path === "review" ? `?employeeId=${user.id}` : ""}`,
+          `/applications/${encodeURIComponent(data.reference)}/${path}`,
           method,
           body,
         ),
@@ -102,6 +105,23 @@ export default function Detail({ data, user, run, busy, onChange, onClose }) {
             Simulation recorded at{" "}
             {new Date(data.payment.paidAt).toLocaleString()}
           </small>
+          {data.paid && (
+            <div className="mt-2">
+              <button
+                className="btn btn-outline-primary"
+                disabled={busy}
+                onClick={() =>
+                  run(() =>
+                    downloadFile(
+                      `/applications/${encodeURIComponent(data.reference)}/receipt.pdf`,
+                    ),
+                  )
+                }
+              >
+                Download receipt (PDF)
+              </button>
+            </div>
+          )}
         </div>
       )}
       {applicant && !closed && !data.paid && (
@@ -127,11 +147,22 @@ export default function Detail({ data, user, run, busy, onChange, onClose }) {
           />
         </div>
       )}
+      <DocumentsPanel
+        data={data}
+        applicant={applicant}
+        reviewer={reviewer}
+        run={run}
+        busy={busy}
+        onChange={onChange}
+      />
       {applicant &&
         data.type === "NEW" &&
         data.status === "CORRECTION_REQUIRED" && (
           <div className="border-top py-3">
-            <h3>Correct and resubmit vehicle details</h3>
+            <h3>Correct and resubmit</h3>
+            <p className="small text-secondary">
+              Replace any rejected document above, check the vehicle details, then resubmit.
+            </p>
             <VehicleForm
               key={data.reference}
               initial={data.vehicleDetails}
@@ -144,6 +175,17 @@ export default function Detail({ data, user, run, busy, onChange, onClose }) {
       {reviewer && !closed && (
         <div className="border-top py-3">
           <h3>Officer review</h3>
+          {data.status === "SUBMITTED" && !documents.allUploaded && (
+            <p className="small text-secondary">
+              Verification can start once the owner has uploaded all three documents.
+            </p>
+          )}
+          {data.status === "UNDER_VERIFICATION" && !documents.allVerified && (
+            <p className="small text-secondary">
+              Verify every document above before verifying the application. If a document is
+              rejected, request a correction so the owner can replace it.
+            </p>
+          )}
           <label className="form-label" htmlFor="remarks">
             Remarks
           </label>
@@ -176,7 +218,9 @@ export default function Detail({ data, user, run, busy, onChange, onClose }) {
                   (["PASS", "FAIL"].includes(action) &&
                     (!data.inspectionDate || data.inspectionDate > today())) ||
                   (action === "APPROVE" &&
-                    (!data.paid || data.inspectionStatus !== "PASSED"))
+                    (!data.paid || data.inspectionStatus !== "PASSED")) ||
+                  (action === "START" && !documents.allUploaded) ||
+                  (action === "VERIFY" && !documents.allVerified)
                 }
                 className={`btn btn-${action === "REJECT" || action === "FAIL" ? "outline-danger" : "outline-primary"}`}
                 onClick={() =>
@@ -205,23 +249,40 @@ export default function Detail({ data, user, run, busy, onChange, onClose }) {
           <div className="d-flex justify-content-between flex-wrap gap-3 align-items-start">
             <div>
               <span className="eyebrow">REGISTRATION CERTIFICATE</span>
-              <h3 className="mt-2">Your vehicle is registered</h3>
+              <h3 className="mt-2">
+                {applicant ? "Your vehicle is registered" : "Vehicle registered"}
+              </h3>
             </div>
-            <button
-              className="btn btn-outline-primary"
-              disabled={busy}
-              onClick={() =>
-                run(async () =>
-                  setCertificate(
-                    await api(
-                      `/applications/${encodeURIComponent(data.reference)}/certificate`,
+            <div className="d-flex flex-wrap gap-2">
+              <button
+                className="btn btn-outline-primary"
+                disabled={busy}
+                onClick={() =>
+                  run(async () =>
+                    setCertificate(
+                      await api(
+                        `/applications/${encodeURIComponent(data.reference)}/certificate`,
+                      ),
                     ),
-                  ),
-                )
-              }
-            >
-              View RC details
-            </button>
+                  )
+                }
+              >
+                View RC details
+              </button>
+              <button
+                className="btn btn-primary"
+                disabled={busy}
+                onClick={() =>
+                  run(() =>
+                    downloadFile(
+                      `/applications/${encodeURIComponent(data.reference)}/certificate.pdf`,
+                    ),
+                  )
+                }
+              >
+                Download RC (PDF)
+              </button>
+            </div>
           </div>
           {(certificate || data.certificate) && (
             <RegistrationCertificate
