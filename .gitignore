@@ -20,3 +20,5 @@ frontend/*.log
 # Uploaded application documents (personal data) - never commit
 uploads/
 config/preview-accounts.md
+# Database backups (personal data, password hashes) - never commit
+config/*.sql

@@ -16,6 +16,11 @@ public interface ApplicationWorkflowRepository
     extends JpaRepository<VehicleRegistrationApplication, String> {
   List<VehicleRegistrationApplication> findByApplicantOwnerId(Long id, Sort sort);
 
+  List<VehicleRegistrationApplication> findByApplicationStatus(ApplicationStatus status, Sort sort);
+
+  List<VehicleRegistrationApplication> findByApplicantOwnerIdAndApplicationStatus(
+      Long id, ApplicationStatus status, Sort sort);
+
   @Query(
       """
       select a from VehicleRegistrationApplication a

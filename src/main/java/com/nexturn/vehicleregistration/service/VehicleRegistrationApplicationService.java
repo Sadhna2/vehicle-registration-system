@@ -7,6 +7,7 @@ import com.nexturn.vehicleregistration.dto.response.ApplicationDetailsResponse;
 import com.nexturn.vehicleregistration.dto.response.ApplicationSummaryResponse;
 import com.nexturn.vehicleregistration.dto.response.RegistrationCertificateResponse;
 import com.nexturn.vehicleregistration.dto.response.VehicleResponse;
+import com.nexturn.vehicleregistration.enums.ApplicationStatus;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public interface VehicleRegistrationApplicationService {
             String referenceNumber,
             ApplicationReviewRequest request, Long employeeId);
 
-    List<ApplicationSummaryResponse> list(Long ownerId);
+    List<ApplicationSummaryResponse> list(Long ownerId, ApplicationStatus status);
 
     ApplicationDetailsResponse get(
             String referenceNumber, Long ownerId);

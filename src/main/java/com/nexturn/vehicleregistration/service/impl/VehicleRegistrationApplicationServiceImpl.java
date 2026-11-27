@@ -7,6 +7,7 @@ import com.nexturn.vehicleregistration.dto.response.ApplicationDetailsResponse;
 import com.nexturn.vehicleregistration.dto.response.ApplicationSummaryResponse;
 import com.nexturn.vehicleregistration.dto.response.RegistrationCertificateResponse;
 import com.nexturn.vehicleregistration.dto.response.VehicleResponse;
+import com.nexturn.vehicleregistration.enums.ApplicationStatus;
 import com.nexturn.vehicleregistration.service.ApplicationQueryService;
 import com.nexturn.vehicleregistration.service.ApplicationReviewService;
 import com.nexturn.vehicleregistration.service.PaymentService;
@@ -61,8 +62,8 @@ public class VehicleRegistrationApplicationServiceImpl
     }
 
     @Override
-    public List<ApplicationSummaryResponse> list(Long ownerId) {
-        return applicationQueryService.list(ownerId);
+    public List<ApplicationSummaryResponse> list(Long ownerId, ApplicationStatus status) {
+        return applicationQueryService.list(ownerId, status);
     }
 
     @Override

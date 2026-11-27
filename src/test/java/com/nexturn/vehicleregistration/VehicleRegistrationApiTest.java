@@ -785,6 +785,39 @@ class VehicleRegistrationApiTest {
         assertEquals(400, raw("POST", "/api/auth/signup", "{bad", Map.of()).statusCode());
     }
 
+    @Test void applicationsCanBeSearchedByStatus() throws Exception {
+        String submitted = submit();
+        String rejected = submit();
+        review(rejected, "REJECT", 200);
+        String otherToken = api("POST", "/api/auth/signup", owner("other-" + UUID.randomUUID() + "@example.com"), 200, null)
+                .path("accessToken").asString();
+        String othersSubmitted = api("POST", "/api/applications", vehicle(), 200, otherToken).path("applicationRefNo").asString();
+
+        JsonNode rejectedOnly = api("GET", "/api/applications?status=REJECTED", null, 200, systemAdminToken);
+        Set<String> rejectedRefs = new HashSet<>();
+        for (JsonNode row : rejectedOnly) {
+            assertEquals("REJECTED", row.path("status").asString());
+            rejectedRefs.add(row.path("reference").asString());
+        }
+        assertTrue(rejectedRefs.contains(rejected));
+        assertFalse(rejectedRefs.contains(submitted));
+
+        Set<String> submittedRefs = new HashSet<>();
+        for (JsonNode row : api("GET", "/api/applications?status=SUBMITTED", null, 200, officerToken)) {
+            submittedRefs.add(row.path("reference").asString());
+        }
+        assertTrue(submittedRefs.contains(submitted) && submittedRefs.contains(othersSubmitted));
+
+        JsonNode mine = api("GET", "/api/applications?status=SUBMITTED", null, 200, ownerToken);
+        for (JsonNode row : mine) {
+            assertNotEquals(othersSubmitted, row.path("reference").asString());
+            assertEquals("SUBMITTED", row.path("status").asString());
+        }
+        assertEquals(0, api("GET", "/api/applications?status=APPROVED", null, 200, otherToken).size());
+        assertEquals("INVALID_REQUEST", api("GET", "/api/applications?status=FINISHED", null, 400, systemAdminToken)
+                .path("code").asString());
+    }
+
     @Test void deferredEndpointsAreAbsentAndHealthIsPublic() throws Exception {
         for (String path : Set.of("/api/applications/renewal", "/api/applications/transfer")) {
             api("GET", path, null, 404, ownerToken);

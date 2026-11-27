@@ -153,6 +153,15 @@ export const money = (value) =>
     value ?? 0,
   );
 export const label = (value) => (value || "").replaceAll("_", " ");
+// Every application status, in workflow order (used by the status search).
+export const APPLICATION_STATUSES = [
+  "SUBMITTED",
+  "UNDER_VERIFICATION",
+  "CORRECTION_REQUIRED",
+  "INSPECTION_PENDING",
+  "APPROVED",
+  "REJECTED",
+];
 export const categories = [
   "TWO_WHEELER",
   "PRIVATE_CAR",

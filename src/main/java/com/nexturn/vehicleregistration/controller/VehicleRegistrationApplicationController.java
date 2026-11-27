@@ -7,6 +7,7 @@ import com.nexturn.vehicleregistration.dto.request.ApplicationReviewRequest;
 import com.nexturn.vehicleregistration.dto.request.NewVehicleRegistrationRequest;
 import com.nexturn.vehicleregistration.dto.response.ApplicationDetailsResponse;
 import com.nexturn.vehicleregistration.dto.response.ApplicationSummaryResponse;
+import com.nexturn.vehicleregistration.enums.ApplicationStatus;
 import com.nexturn.vehicleregistration.enums.SessionRole;
 import com.nexturn.vehicleregistration.security.Actor;
 import com.nexturn.vehicleregistration.security.Allow;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,10 +29,14 @@ public class VehicleRegistrationApplicationController {
     @Autowired
     private VehicleRegistrationApplicationService applicationService;
 
-    /** Owners see their own applications; staff see the full review queue. */
+    /**
+     * Owners see their own applications; staff (including the system admin) see all of them.
+     * Optional {@code status} (e.g. SUBMITTED, APPROVED) returns only applications in that state.
+     */
     @GetMapping
-    public List<ApplicationSummaryResponse> list(Actor actor) {
-        return applicationService.list(ownerScope(actor));
+    public List<ApplicationSummaryResponse> list(Actor actor,
+            @RequestParam(name = "status", required = false) ApplicationStatus status) {
+        return applicationService.list(ownerScope(actor), status);
     }
 
     @PostMapping

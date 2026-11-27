@@ -135,7 +135,7 @@ public class PdfServiceImpl implements PdfService {
     public PdfFile applicationsReport() {
         Map<String, Object> report = reportService.report();
         Map<String, Long> counts = (Map<String, Long>) report.get("counts");
-        List<ApplicationSummaryResponse> applications = applicationQueryService.list(null);
+        List<ApplicationSummaryResponse> applications = applicationQueryService.list(null, null);
         byte[] pdf = render(PageSize.A4.rotate(), document -> {
             header(document, "Applications report", "Generated " + date(LocalDate.now()));
             section(document, "Summary", new String[][] {

@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
-import { api, downloadFile, label, money, today } from "../api";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { api, APPLICATION_STATUSES, downloadFile, label, money, today } from "../api";
 import useSelection from "../hooks/useSelection";
 import BulkResult from "./BulkResult";
 import SelectionCheckbox from "./SelectionCheckbox";
@@ -25,7 +26,36 @@ export default function ApplicationsPage({ data, user, run, busy, onOpen, onRefr
   const owner = user.role === "OWNER";
   const reviewer = ["RTO_OFFICER", "RTO_ADMIN"].includes(user.role);
 
-  const rows = data.applications.filter((row) =>
+  // The status filter lives in the URL (?status=APPROVED) so a filtered list can be bookmarked,
+  // and is applied by the backend (GET /api/applications?status=...).
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requested = searchParams.get("status") || "";
+  const status = APPLICATION_STATUSES.includes(requested) ? requested : "";
+  const [filtered, setFiltered] = useState(null);
+  useEffect(() => {
+    if (!status) {
+      setFiltered(null);
+      return undefined;
+    }
+    let active = true;
+    api(`/applications?status=${status}`)
+      .then((rows) => active && setFiltered({ status, rows, error: "" }))
+      .catch((failure) => active && setFiltered({ status, rows: [], error: failure.message }));
+    return () => {
+      active = false;
+    };
+    // data.applications changes after every refresh, so the filtered list reloads with it.
+  }, [status, data.applications]);
+  const loadingFilter = Boolean(status) && filtered?.status !== status;
+  const source = status ? (loadingFilter ? [] : filtered.rows) : data.applications;
+  const setStatus = (value) => {
+    const next = new URLSearchParams(searchParams);
+    if (value) next.set("status", value);
+    else next.delete("status");
+    setSearchParams(next);
+  };
+
+  const rows = source.filter((row) =>
     `${row.reference} ${row.owner} ${row.vehicle}`.toLowerCase().includes(query.toLowerCase()),
   );
   // Owners can only withdraw applications that are not yet under review.
@@ -92,12 +122,15 @@ export default function ApplicationsPage({ data, user, run, busy, onOpen, onRefr
         </div>
       </form>
       <div className="d-flex flex-wrap justify-content-between gap-2 mb-3">
-        <h2>Application register ({data.applications.length})</h2>
+        <h2>
+          {status ? `${label(status).toLowerCase().replace(/^./, (c) => c.toUpperCase())} applications` : "Application register"} (
+          {loadingFilter ? "…" : source.length})
+        </h2>
         <div className="d-flex gap-2">
           <button
             className="btn btn-outline-primary"
             disabled={busy}
-            onClick={() => run(() => downloadFile("/export/applications.csv"))}
+            onClick={() => run(() => downloadFile(`/export/applications.csv${status ? `?status=${status}` : ""}`))}
           >
             Export CSV
           </button>
@@ -106,15 +139,37 @@ export default function ApplicationsPage({ data, user, run, busy, onOpen, onRefr
           </button>
         </div>
       </div>
-      <label className="form-label" htmlFor="application-filter">
-        Filter applications
-      </label>
-      <input
-        id="application-filter"
-        className="form-control mb-3"
-        value={query}
-        onChange={(event) => setQuery(event.target.value)}
-      />
+      <div className="row g-2 mb-3">
+        <div className="col-md-4">
+          <label className="form-label" htmlFor="application-status">
+            Status
+          </label>
+          <select
+            id="application-status"
+            className="form-select"
+            value={status}
+            onChange={(event) => setStatus(event.target.value)}
+          >
+            <option value="">All statuses</option>
+            {APPLICATION_STATUSES.map((value) => (
+              <option key={value} value={value}>
+                {label(value)}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="col-md-8">
+          <label className="form-label" htmlFor="application-filter">
+            Search reference, owner or vehicle
+          </label>
+          <input
+            id="application-filter"
+            className="form-control"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+        </div>
+      </div>
 
       {canSelect && selection.count > 0 && (
         <div className="bulk-bar" role="region" aria-label="Bulk actions">
@@ -234,8 +289,14 @@ export default function ApplicationsPage({ data, user, run, busy, onOpen, onRefr
       </div>
       {rows.length === 0 && (
         <p className="text-secondary">
-          {data.loaded
-            ? "No matching applications."
+          {filtered?.error
+            ? filtered.error
+            : loadingFilter
+              ? "Loading applications…"
+              : data.loaded
+            ? status
+              ? `No ${label(status).toLowerCase()} applications.`
+              : "No matching applications."
             : data.error
               ? "Could not load applications. Select Refresh to try again."
               : "Loading applications…"}

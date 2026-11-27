@@ -11,6 +11,7 @@ import com.nexturn.vehicleregistration.entity.OwnerPaymentDetail;
 import com.nexturn.vehicleregistration.entity.RegistrationCertificate;
 import com.nexturn.vehicleregistration.entity.Vehicle;
 import com.nexturn.vehicleregistration.entity.VehicleRegistrationApplication;
+import com.nexturn.vehicleregistration.enums.ApplicationStatus;
 import com.nexturn.vehicleregistration.exception.ReferenceNumberNotFoundException;
 import com.nexturn.vehicleregistration.exception.RegistrationCertificateNotFoundException;
 import com.nexturn.vehicleregistration.dto.response.ApplicationDocumentResponse;
@@ -61,11 +62,18 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
     }
 
     @Override
-    public List<ApplicationSummaryResponse> list(Long ownerId) {
+    public List<ApplicationSummaryResponse> list(Long ownerId, ApplicationStatus status) {
         Sort sort = Sort.by("submittedDate").descending();
-        List<VehicleRegistrationApplication> applications = ownerId == null
-                ? applicationRepository.findAll(sort)
-                : applicationRepository.findByApplicantOwnerId(ownerId, sort);
+        List<VehicleRegistrationApplication> applications;
+        if (ownerId == null) {
+            applications = status == null
+                    ? applicationRepository.findAll(sort)
+                    : applicationRepository.findByApplicationStatus(status, sort);
+        } else {
+            applications = status == null
+                    ? applicationRepository.findByApplicantOwnerId(ownerId, sort)
+                    : applicationRepository.findByApplicantOwnerIdAndApplicationStatus(ownerId, status, sort);
+        }
         return applications.stream()
                 .map(this::toApplicationSummaryResponse)
                 .toList();

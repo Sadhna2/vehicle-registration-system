@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { api, categories, downloadFile, label, money } from "../api";
+import { api, downloadFile, label, money } from "../api";
 import useSelection from "../hooks/useSelection";
 import BulkResult from "./BulkResult";
 import Form from "./Form";
@@ -8,7 +8,6 @@ import SelectionCheckbox from "./SelectionCheckbox";
 
 const STATUSES = ["ACTIVE", "INACTIVE", "SUSPENDED"];
 const ROLES = ["RTO_OFFICER", "RTO_ADMIN", "SYSTEM_ADMIN"];
-const FEE_COLUMNS = ["vehicleCategory", "applicationType", "feeAmount", "effectiveFrom"];
 const EMPLOYEE_COLUMNS = ["firstName", "lastName", "emailAddress", "phoneNumber", "password", "designation", "role"];
 
 // Bar shown above a table when rows are ticked: set one status (and, for
@@ -57,18 +56,15 @@ function ExportButton({ path, run, busy, children = "Export CSV" }) {
 
 export default function Admin({ user, run, busy, onError }) {
   const [report, setReport] = useState(null);
-  const [fees, setFees] = useState([]);
   const [logs, setLogs] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [owners, setOwners] = useState([]);
   const [result, setResult] = useState(null);
   const systemAdmin = user.role === "SYSTEM_ADMIN";
-  const rtoAdmin = user.role === "RTO_ADMIN";
 
   const load = useCallback(async () => {
-    const [r, f, l, e] = await Promise.all([api("/reports"), api("/fees"), api("/audit"), api("/employees")]);
+    const [r, l, e] = await Promise.all([api("/reports"), api("/audit"), api("/employees")]);
     setReport(r);
-    setFees(f);
     setLogs(l);
     setEmployees(e);
     if (systemAdmin) setOwners(await api("/owners"));
@@ -78,7 +74,6 @@ export default function Admin({ user, run, busy, onError }) {
     load().catch((failure) => onError(failure.message));
   }, [load, onError]);
 
-  const feeSelection = useSelection(fees.map((f) => f.feeRuleId));
   const employeeSelection = useSelection(
     employees.filter((e) => e.employeeId !== user.id).map((e) => e.employeeId),
   );
@@ -136,91 +131,6 @@ export default function Admin({ user, run, busy, onError }) {
                 {label(k)}: <strong>{v}</strong>
               </span>
             ))}
-          </div>
-        </section>
-      )}
-
-      {rtoAdmin && (
-        <section className="card p-4">
-          <div className="d-flex flex-wrap justify-content-between gap-2">
-            <h2>Fee rules</h2>
-            <ExportButton path="/export/fees.csv" run={run} busy={busy} />
-          </div>
-          <p className="text-secondary">New rules apply to future applications. Submitted fees remain fixed.</p>
-          <Form
-            busy={busy}
-            fields={[
-              { name: "vehicleCategory", options: categories },
-              { name: "applicationType", options: ["NEW"] },
-              { name: "feeAmount", type: "number", min: 0.01, step: 0.01 },
-              { name: "effectiveFrom", type: "date" },
-            ]}
-            onSubmit={(x) => save("/fees", { ...x, feeAmount: Number(x.feeAmount) })}
-          />
-          <ImportPanel
-            path="/import/fees"
-            columns={FEE_COLUMNS}
-            title="Import fee rules from CSV"
-            run={run}
-            busy={busy}
-            onImported={() => run(load)}
-          />
-          {feeSelection.count > 0 && (
-            <div className="bulk-bar mt-4" role="region" aria-label="Bulk fee rule actions">
-              <strong>{feeSelection.count} selected</strong>
-              <button
-                className="btn btn-outline-danger"
-                disabled={busy}
-                onClick={() => {
-                  if (window.confirm(`Delete ${feeSelection.count} fee rules? Rules used by applications are kept.`))
-                    bulk("Delete fee rules", "POST", "/fees/bulk/delete", { ids: feeSelection.ids.map(Number) }, feeSelection);
-                }}
-              >
-                Delete {feeSelection.count}
-              </button>
-              <button className="btn btn-link" disabled={busy} onClick={feeSelection.clear}>
-                Clear
-              </button>
-            </div>
-          )}
-          <div className="table-responsive mt-4">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th className="select-column">
-                    <SelectionCheckbox
-                      checked={feeSelection.allSelected}
-                      indeterminate={feeSelection.someSelected}
-                      disabled={busy || fees.length === 0}
-                      onChange={feeSelection.toggleAll}
-                      label="Select all fee rules"
-                    />
-                  </th>
-                  <th>Category</th>
-                  <th>Type</th>
-                  <th>Fee</th>
-                  <th>Effective from</th>
-                </tr>
-              </thead>
-              <tbody>
-                {fees.map((f) => (
-                  <tr key={f.feeRuleId} className={feeSelection.has(f.feeRuleId) ? "table-active" : ""}>
-                    <td className="select-column">
-                      <SelectionCheckbox
-                        checked={feeSelection.has(f.feeRuleId)}
-                        disabled={busy}
-                        onChange={() => feeSelection.toggle(f.feeRuleId)}
-                        label={`Select ${label(f.vehicleCategory)} fee from ${f.effectiveFrom}`}
-                      />
-                    </td>
-                    <td>{label(f.vehicleCategory)}</td>
-                    <td>{f.applicationType}</td>
-                    <td>{money(f.feeAmount)}</td>
-                    <td>{f.effectiveFrom}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
         </section>
       )}
